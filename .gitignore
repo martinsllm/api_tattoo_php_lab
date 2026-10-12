@@ -14,6 +14,9 @@ composer.phar
 .env.local
 .env.*.local
 
+# Planejamento local (não versionar)
+sprint.md
+
 # SO
 .DS_Store
 Thumbs.db

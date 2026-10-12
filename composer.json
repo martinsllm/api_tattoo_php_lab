@@ -1,0 +1,17 @@
+{
+    "name": "app/api-tattoo-php-lab",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "martinsllm",
+            "email": "lucaslm2010@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.4"
+    }
+}
