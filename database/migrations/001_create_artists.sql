@@ -1,0 +1,10 @@
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 1', 'Balneario Camboriu', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 2', 'Itajai', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 3', 'Florianopolis', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 4', 'Joinville', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 5', 'Sao Jose', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 6', 'Palhoça', 'SC');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 7', 'Sao Paulo', 'SP');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 8', 'Rio de Janeiro', 'RJ');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 9', 'Belo Horizonte', 'MG');
+INSERT INTO artists (studio_name, city, state) VALUES ('Studio 10', 'Curitiba', 'PR');

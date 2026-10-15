@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS api_tattoo_php_lab;
+
+USE api_tattoo_php_lab;
+
+CREATE TABLE IF NOT EXISTS artists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    studio_name VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    state CHAR(2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
