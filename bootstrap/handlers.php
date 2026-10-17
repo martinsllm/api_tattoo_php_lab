@@ -3,25 +3,17 @@
 declare(strict_types=1);
 
 use App\Repositories\ArtistRepository;
+use App\Controllers\ArtistController;
+use App\Controllers\HealthController;
 
 function routeHandlers(ArtistRepository $artistRepository): array
 {
+    $artistController = new ArtistController($artistRepository);
+    $healthController = new HealthController();
+
     return [
-        'health' => function (array $params): void {
-            sendJsonResponse(200, ['ok' => true]);
-        },
-        'artist.index' => function (array $params) use ($artistRepository): void {
-            sendJsonResponse(200, ['artists' => $artistRepository->index()]);
-        },
-        'artist.show' => function (array $params) use ($artistRepository): void {
-            $id = (int) $params['id'];
-            $artist = $artistRepository->show($id);
-
-            if ($artist !== false) {
-                sendJsonResponse(200, ['artist' => $artist]);
-            }
-
-            sendJsonResponse(404, ['error' => 'Artist not found']);
-        },
+        'health' => [$healthController, 'index'],
+        'artist.index' => [$artistController, 'index'],
+        'artist.show' => [$artistController, 'show'],
     ];
 }
