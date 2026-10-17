@@ -9,6 +9,7 @@ loadEnv(__DIR__ . '/../.env');
 
 use App\Database\Connection;
 use App\Repositories\ArtistRepository;
+use App\Routing\Router;
 
 $connection = new Connection();
 $artistRepository = new ArtistRepository($connection);
@@ -17,7 +18,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = rtrim($path, '/');
 $path = $path === '' ? '/' : $path;
-$parts = explode('/', trim($path, '/'));
 
 function sendJsonResponse(int $status, array $data): void
 {
@@ -27,23 +27,33 @@ function sendJsonResponse(int $status, array $data): void
     exit;
 }
 
-if ($method === 'GET' && $path === '/health') {
-    sendJsonResponse(200, ['ok' => true]);
-} else if ($method === 'GET' && $path === '/artists') {
-    sendJsonResponse(200, ['artists' => $artistRepository->index()]);
-}  elseif (
-    $method === 'GET'
-    && count($parts) === 2
-    && $parts[0] === 'artists'
-    && ctype_digit($parts[1])
-) {
-    $id = (int) $parts[1];
-    $artist = $artistRepository->show($id);
-    if ($artist !== false) {
-        sendJsonResponse(200, ['artist' => $artist]);
-    } else {
-        sendJsonResponse(404, ['error' => 'Artist not found']);
-    }
-} else {
+$routes = require __DIR__ . '/../src/Routing/routes.php';
+$router = new Router($routes);
+$route = $router->match($method, $path);
+
+
+if ($route === null) {
     sendJsonResponse(404, ['error' => 'Not Found']);
 }
+
+$handler = $route['handler'];
+
+if ($handler === 'health') {
+    sendJsonResponse(200, ['ok' => true]);
+} 
+
+if ($handler === 'artist.index') {
+    sendJsonResponse(200, ['artists' => $artistRepository->index()]);
+}
+
+if ($handler === 'artist.show') {
+    $id = (int) $route['params']['id'];
+    $artist = $artistRepository->show($id);
+
+    if ($artist !== false) {
+        sendJsonResponse(200, ['artist' => $artist]);
+    }
+    
+    sendJsonResponse(404, ['error' => 'Artist not found']);
+}
+
