@@ -9,26 +9,21 @@ require __DIR__ . '/../bootstrap/handlers.php';
 
 loadEnv(__DIR__ . '/../.env');
 
-use App\Database\Connection;
-use App\Repositories\ArtistRepository;
-use App\Routing\Router;
-
-$connection = new Connection();
-$artistRepository = new ArtistRepository($connection);
-
 $method = $_SERVER['REQUEST_METHOD'];
 $path = requestPath();
 
-$handlers = routeHandlers($artistRepository);
+$app = require __DIR__ . '/../bootstrap/app.php';
 
-$routes = require __DIR__ . '/../src/Routing/routes.php';
-$router = new Router($routes);
-$route = $router->match($method, $path);
+$route = $app['router']->match($method, $path);
 
-$handler = $route['handler'];
-
-if (!isset($handlers[$handler])) {
+if ($route === null) {
     sendJsonResponse(404, ['error' => 'Not Found']);
 }
 
-$handlers[$handler]($route['params']);
+$handler = $route['handler'];
+
+if (!isset($app['handlers'][$handler])) {
+    sendJsonResponse(404, ['error' => 'Not Found']);
+}
+
+$app['handlers'][$handler]($route['params']);
