@@ -10,9 +10,6 @@ class Router
 
     public function match(string $method, string $path): ?array
     {
-       $path = rtrim($path, '/');
-       $path = $path === '' ? '/' : $path;
-
        if (!isset($this->routes[$method])) {
             return null;
        }
