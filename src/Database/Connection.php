@@ -14,11 +14,11 @@ final class Connection
 
     public function __construct()
     {
-        $host = getenv('DB_HOST') ?: '127.0.0.1';
-        $port = getenv('DB_PORT') ?: '3307';
-        $db = getenv('DB_NAME') ?: '';
-        $user = getenv('DB_USER') ?: '';
-        $pass = getenv('DB_PASSWORD') ?: '';
+        $host = env('DB_HOST', '127.0.0.1');
+        $port = env('DB_PORT', '3307');
+        $db = env('DB_NAME');
+        $user = env('DB_USER');
+        $pass = env('DB_PASSWORD');
 
         $dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
 
