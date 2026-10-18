@@ -8,6 +8,6 @@ class HealthController
 {
     public function index(): void
     {
-        sendJsonResponse(200, ['ok' => true]);
+        jsonSuccess(200, ['ok' => true]);
     }
 }

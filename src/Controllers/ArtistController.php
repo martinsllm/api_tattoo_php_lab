@@ -10,13 +10,11 @@ class ArtistController
 {
     
     public function __construct(private ArtistRepository $artistRepository)
-    {
-        $this->artistRepository = $artistRepository;
-    }
+    {}
 
     public function index(array $params): void
     {
-        sendJsonResponse(200, ['artists' => $this->artistRepository->index()]);
+        jsonSuccess(200, $this->artistRepository->index());
     }
 
     public function show(array $params): void
@@ -25,9 +23,9 @@ class ArtistController
         $artist = $this->artistRepository->show($id);
 
         if ($artist !== false) {
-            sendJsonResponse(200, ['artist' => $artist]);
+            jsonSuccess(200, $artist);
         }
 
-        sendJsonResponse(404, ['error' => 'Artist not found']);
+        jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');
     }
 }

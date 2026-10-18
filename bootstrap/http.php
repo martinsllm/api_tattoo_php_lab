@@ -17,3 +17,22 @@ function sendJsonResponse(int $status, array $data): void
     echo json_encode($data, JSON_THROW_ON_ERROR);
     exit;
 }
+
+function jsonSuccess(int $status, mixed $data): void
+{
+    sendJsonResponse($status, ['data' => $data]);
+}
+
+function jsonError(int $status, string $message, string $code, ?array $fiedldErrors = null): void
+{
+    $error = [
+        'message' => $message,
+        'code' => $code,
+    ];
+
+    if ($fiedldErrors !== null) {
+        $error['errors'] = $fiedldErrors;
+    }
+
+    sendJsonResponse($status, ['error' => $error]);
+}

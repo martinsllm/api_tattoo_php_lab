@@ -17,13 +17,13 @@ $app = require __DIR__ . '/../bootstrap/app.php';
 $route = $app['router']->match($method, $path);
 
 if ($route === null) {
-    sendJsonResponse(404, ['error' => 'Not Found']);
+    jsonError(404, 'Not Found', 'ROUTE_NOT_FOUND');
 }
 
 $handler = $route['handler'];
 
 if (!isset($app['handlers'][$handler])) {
-    sendJsonResponse(404, ['error' => 'Not Found']);
+    jsonError(404, 'Not Found', 'HANDLER_NOT_FOUND');
 }
 
 $app['handlers'][$handler]($route['params']);
