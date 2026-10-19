@@ -8,4 +8,7 @@ return [
         '/artists' => ['handler' => 'artist.index'],
         '/artists/{id}' => ['handler' => 'artist.show'],
     ],
+    'POST' => [
+        '/reviews' => ['handler' => 'review.store'],
+    ],
 ];

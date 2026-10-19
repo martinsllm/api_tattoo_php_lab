@@ -5,12 +5,14 @@ declare(strict_types=1);
 use App\AppContext;
 use App\Database\Connection;
 use App\Repositories\ArtistRepository;
+use App\Repositories\ReviewRepository;
 use App\Routing\Router;
 
 $connection = new Connection();
 
 $context = new AppContext(
-    new ArtistRepository($connection)
+    new ArtistRepository($connection),
+    new ReviewRepository($connection),
 );
 
 $handlers = routeHandlers($context);

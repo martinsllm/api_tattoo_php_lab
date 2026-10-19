@@ -36,3 +36,24 @@ function jsonError(int $status, string $message, string $code, ?array $fiedldErr
 
     sendJsonResponse($status, ['error' => $error]);
 }
+
+function requestJsonBody(): array
+{
+    $raw = file_get_contents('php://input');
+
+    if ($raw === false || trim($raw) === '') {
+        return [];
+    }
+
+    try {
+        $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+    } catch (JsonException) {
+        jsonError(400, 'Invalid JSON body', 'INVALID_JSON');
+    }
+
+    if (!is_array($decoded)) {
+        jsonError(400, 'JSON body must be an object', 'INVALID_JSON');
+    }
+
+    return $decoded;
+}

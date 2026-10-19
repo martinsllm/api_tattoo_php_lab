@@ -14,7 +14,8 @@ Contrato HTTP/JSON do lab (PHP nativo). Objetivo: respostas previsíveis e compa
 | ---------------- | ---- | ------------------------------------------------ |
 | `ROUTE_NOT_FOUND`  | 404  | Rota ou handler inexistente                      |
 | `ARTIST_NOT_FOUND` | 404  | `GET /artists/{id}` sem registro no banco        |
-| `VALIDATION_ERROR` | 422  | Payload inválido (previsto para `POST /reviews`) |
+| `VALIDATION_ERROR` | 422  | Payload inválido em `POST /reviews`              |
+| `INVALID_JSON`     | 400  | Body não é JSON válido ou não é um objeto JSON     |
 
 ## Exemplos — sucesso
 
@@ -58,6 +59,23 @@ Contrato HTTP/JSON do lab (PHP nativo). Objetivo: respostas previsíveis e compa
 }
 ```
 
+**POST /reviews — 201**
+
+Body: `{ "artist_id": 1, "rating": 5, "comment": "…" }` (`comment` opcional).
+
+```json
+{
+  "data": {
+    "id": 6,
+    "artist_id": 1,
+    "rating": 5,
+    "comment": "Ótimo!"
+  }
+}
+```
+
+Sem `comment` no body, `"comment": null` em `data`.
+
 ## Exemplos — erro
 
 **Rota desconhecida — 404**
@@ -82,7 +100,7 @@ Contrato HTTP/JSON do lab (PHP nativo). Objetivo: respostas previsíveis e compa
 }
 ```
 
-**Validação (futuro POST /reviews) — 422**
+**POST /reviews — validação — 422**
 
 ```json
 {
@@ -96,7 +114,18 @@ Contrato HTTP/JSON do lab (PHP nativo). Objetivo: respostas previsíveis e compa
 }
 ```
 
+**POST /reviews — JSON inválido — 400**
+
+```json
+{
+  "error": {
+    "message": "Invalid JSON body",
+    "code": "INVALID_JSON"
+  }
+}
+```
+
 ## Implementação (referência)
 
-- Helpers planejados em `bootstrap/http.php`: `jsonSuccess(int $status, mixed $data)` e `jsonError(int $status, string $message, string $code, ?array $fieldErrors = null)`.
-- Controllers e o dispatch no `index` devem usar esses helpers em vez de montar o envelope manualmente.
+- Helpers em `bootstrap/http.php`: `jsonSuccess(int $status, mixed $data)`, `jsonError(int $status, string $message, string $code, ?array $fieldErrors = null)` e `requestJsonBody(): array` (leitura de `php://input` + decode).
+- Controllers e o dispatch no `index` usam esses helpers em vez de montar o envelope manualmente.
