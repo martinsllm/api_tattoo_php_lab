@@ -15,10 +15,10 @@ class ArtistRepository
     {
         $pdo = $this->connection->pdo();
         $stmt = $pdo->query('SELECT * FROM artists');
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 
-    public function show(int $id)
+    public function show(int $id): array|false
     {
         $pdo = $this->connection->pdo();
         $stmt = $pdo->prepare('SELECT * FROM artists WHERE id = :id');

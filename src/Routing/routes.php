@@ -7,6 +7,8 @@ return [
         '/health' => ['handler' => 'health'],
         '/artists' => ['handler' => 'artist.index'],
         '/artists/{id}' => ['handler' => 'artist.show'],
+        '/reviews' => ['handler' => 'review.index'],
+        '/reviews/{id}' => ['handler' => 'review.show'],
     ],
     'POST' => [
         '/reviews' => ['handler' => 'review.store'],

@@ -11,6 +11,22 @@ class ReviewRepository
     {
     }
 
+    public function index(): array
+    {
+        $pdo = $this->connection->pdo();
+        $stmt = $pdo->query('SELECT * FROM reviews');
+        return $stmt->fetchAll();
+    }
+
+    public function show(int $id): array|false
+    {
+        $pdo = $this->connection->pdo();
+        $stmt = $pdo->prepare('SELECT * FROM reviews WHERE id = :id');
+        $stmt->bindValue('id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     public function create(array $data)
     {
         $pdo = $this->connection->pdo();

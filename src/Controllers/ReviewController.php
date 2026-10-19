@@ -15,6 +15,23 @@ class ReviewController
     ) {
     }
 
+    public function index(array $params): void
+    {
+        jsonSuccess(200, $this->reviewRepository->index());
+    }
+
+    public function show(array $params): void
+    {
+        $id = (int) $params['id'];
+        $review = $this->reviewRepository->show($id);
+
+        if ($review !== false) {
+            jsonSuccess(200, $review);
+        } 
+
+        jsonError(404, 'Review not found', 'REVIEW_NOT_FOUND');
+    }
+
     public function store(array $params): void
     {
         $data = requestJsonBody();

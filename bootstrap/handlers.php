@@ -18,5 +18,7 @@ function routeHandlers(AppContext $app): array
         'artist.index' => [$artistController, 'index'],
         'artist.show' => [$artistController, 'show'],
         'review.store' => [$reviewController, 'store'],
+        'review.index' => [$reviewController, 'index'],
+        'review.show' => [$reviewController, 'show'],
     ];
 }
