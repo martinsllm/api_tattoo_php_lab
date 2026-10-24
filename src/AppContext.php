@@ -6,11 +6,15 @@ namespace App;
 
 use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
+use App\Repositories\ArtistImageRepository;
+use App\Services\UploadService;
 
 final readonly class AppContext
 {
     public function __construct(
         public ArtistRepository $artistRepository,
         public ReviewRepository $reviewRepository,
+        public ArtistImageRepository $artistImageRepository,
+        public UploadService $uploadService,
     ) {}
 }
