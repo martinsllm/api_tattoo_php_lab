@@ -19,3 +19,15 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (artist_id) REFERENCES artists(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS artist_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    artist_id INT NOT NULL,
+    image_url VARCHAR(255) NOT NULL,
+    image_filename VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(100) NOT NULL,
+    size_bytes INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (artist_id) REFERENCES artists(id)
+        ON DELETE CASCADE
+);
