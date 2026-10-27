@@ -23,5 +23,6 @@ function routeHandlers(AppContext $app): array
         'review.index' => [$reviewController, 'index'],
         'review.show' => [$reviewController, 'show'],
         'artist-image.store' => [$artistImageController, 'store'],
+        'artist-image.show' => [$artistImageController, 'show'],
     ];
 }

@@ -11,6 +11,15 @@ class ArtistImageRepository
     {
     }
 
+    public function show(int $id): array|false
+    {
+        $pdo = $this->connection->pdo();
+        $stmt = $pdo->prepare('SELECT * FROM artist_images WHERE id = :id');
+        $stmt->bindValue('id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
     public function create(array $data)
     {
         $pdo = $this->connection->pdo();

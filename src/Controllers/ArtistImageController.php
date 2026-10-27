@@ -16,6 +16,29 @@ class ArtistImageController
         private UploadService $uploadService,
     ){}
 
+    public function show(array $params): void
+    {
+        $id = (int) $params['id'];
+        $artistImage = $this->artistImageRepository->show($id);
+
+        if ($artistImage === false) {
+            jsonError(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+        }
+
+        $root = rtrim($this->uploadService->uploadsRoot(), '/');
+        $path = $root . '/' . $artistImage['stored_path'];
+
+        if (!is_file($path)) {
+            jsonError(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+        }
+
+        http_response_code(200);
+        header('Content-Type: ' . $artistImage['mime_type']);
+        header('Content-Length: ' . (string) filesize($path));
+        readfile($path);
+        exit;
+    }
+
     public function store(array $params): void
     {
         $artistId = (int) $params['id'];
