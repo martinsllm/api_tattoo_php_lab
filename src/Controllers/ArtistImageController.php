@@ -16,6 +16,19 @@ class ArtistImageController
         private UploadService $uploadService,
     ){}
 
+    public function index(array $params): void
+    {
+        $id = (int) $params['id'];
+
+        if($this->artistRepository->show($id) === false) {
+            jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+        }
+
+        $images = $this->artistImageRepository->index($id);
+
+        jsonSuccess(200, $images);
+    }
+
     public function show(array $params): void
     {
         $id = (int) $params['id'];

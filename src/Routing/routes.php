@@ -10,6 +10,7 @@ return [
         '/reviews' => ['handler' => 'review.index'],
         '/reviews/{id}' => ['handler' => 'review.show'],
         '/artist-images/{id}' => ['handler' => 'artist-image.show'],
+        '/artists/{id}/portfolio' => ['handler' => 'artist-image.index'],
     ],
     'POST' => [
         '/reviews' => ['handler' => 'review.store'],

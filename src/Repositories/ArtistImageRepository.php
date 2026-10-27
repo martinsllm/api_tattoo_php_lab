@@ -11,6 +11,15 @@ class ArtistImageRepository
     {
     }
 
+    public function index(int $id): array
+    {
+        $pdo = $this->connection->pdo();
+        $stmt = $pdo->prepare('SELECT * FROM artist_images WHERE artist_id = :id ORDER BY created_at DESC');
+        $stmt->bindValue('id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function show(int $id): array|false
     {
         $pdo = $this->connection->pdo();
