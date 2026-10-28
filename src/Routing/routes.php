@@ -15,5 +15,7 @@ return [
     'POST' => [
         '/reviews' => ['handler' => 'review.store'],
         '/artists/{id}/portfolio' => ['handler' => 'artist-image.store'],
+        '/auth/register' => ['handler' => 'auth.register'],
+        '/auth/login' => ['handler' => 'auth.login'],
     ],
 ];

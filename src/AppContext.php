@@ -7,6 +7,7 @@ namespace App;
 use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
 use App\Repositories\ArtistImageRepository;
+use App\Repositories\UserRepository;
 use App\Services\UploadService;
 
 final readonly class AppContext
@@ -15,6 +16,7 @@ final readonly class AppContext
         public ArtistRepository $artistRepository,
         public ReviewRepository $reviewRepository,
         public ArtistImageRepository $artistImageRepository,
+        public UserRepository $userRepository,
         public UploadService $uploadService,
     ) {}
 }

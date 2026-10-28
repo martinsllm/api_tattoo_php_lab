@@ -7,6 +7,7 @@ use App\Database\Connection;
 use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
 use App\Repositories\ArtistImageRepository;
+use App\Repositories\UserRepository;
 use App\Routing\Router;
 use App\Services\UploadService;
 
@@ -17,6 +18,7 @@ $context = new AppContext(
     new ArtistRepository($connection),
     new ReviewRepository($connection),
     new ArtistImageRepository($connection),
+    new UserRepository($connection),
     new UploadService($uploadsPath),
 );
 
