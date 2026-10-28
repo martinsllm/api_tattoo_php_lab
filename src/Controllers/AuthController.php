@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Repositories\UserRepository;
+use App\Services\JwtService;
 
 class AuthController
 {
-    public function __construct(private UserRepository $userRepository)
+    public function __construct(private UserRepository $userRepository, private JwtService $jwtService)
     {
     }
 
@@ -55,5 +56,41 @@ class AuthController
         ]);
 
         jsonSuccess(201, $user);
+    }
+
+    public function login(array $params)
+    {
+        $data = requestJsonBody();
+        $errors = [];
+
+        if (!array_key_exists('email', $data) || $data['email'] === '' || $data['email'] === null) {
+            $errors['email'][] = 'Email is required.';
+        }
+
+        if (!array_key_exists('password', $data) || $data['password'] === '' || $data['password'] === null) {
+            $errors['password'][] = 'Password is required.';
+        }
+
+        if ($errors !== []) {
+            jsonError(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
+        }
+        
+        $user = $this->userRepository->findByEmail($data['email']);
+
+        if (!$user) {
+            jsonError(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+        }
+
+        if (!password_verify($data['password'], $user['password_hash'])) {
+            jsonError(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+        }
+
+        unset($user['password_hash']);
+        $token = $this->jwtService->issue($user['id'], $user['role']);
+        jsonSuccess(200, [
+            'user' => $user,
+            'token' => $token,
+        ]);
+        
     }
 }

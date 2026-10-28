@@ -10,6 +10,7 @@ use App\Repositories\ArtistImageRepository;
 use App\Repositories\UserRepository;
 use App\Routing\Router;
 use App\Services\UploadService;
+use App\Services\JwtService;
 
 $connection = new Connection();
 $uploadsPath = dirname(__DIR__) . '/storage/uploads';
@@ -20,6 +21,7 @@ $context = new AppContext(
     new ArtistImageRepository($connection),
     new UserRepository($connection),
     new UploadService($uploadsPath),
+    new JwtService(env('JWT_SECRET'), (int) env('JWT_TTL', '3600')),
 );
 
 $handlers = routeHandlers($context);

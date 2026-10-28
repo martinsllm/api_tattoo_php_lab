@@ -9,6 +9,7 @@ use App\Repositories\ReviewRepository;
 use App\Repositories\ArtistImageRepository;
 use App\Repositories\UserRepository;
 use App\Services\UploadService;
+use App\Services\JwtService;
 
 final readonly class AppContext
 {
@@ -18,5 +19,6 @@ final readonly class AppContext
         public ArtistImageRepository $artistImageRepository,
         public UserRepository $userRepository,
         public UploadService $uploadService,
+        public JwtService $jwtService,
     ) {}
 }

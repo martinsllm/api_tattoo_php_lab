@@ -15,7 +15,7 @@ function routeHandlers(AppContext $app): array
     $healthController = new HealthController();
     $reviewController = new ReviewController($app->reviewRepository, $app->artistRepository);
     $artistImageController = new ArtistImageController($app->artistImageRepository, $app->artistRepository, $app->uploadService);
-    $authController = new AuthController($app->userRepository);
+    $authController = new AuthController($app->userRepository, $app->jwtService);
 
     return [
         'health' => [$healthController, 'index'],
