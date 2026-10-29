@@ -39,8 +39,14 @@ class ReviewController
 
     public function store(array $params): void
     {
-        \requireAuth($this->jwtService);
+        $auth = \requireAuth($this->jwtService);
         
+        if ($auth['role'] !== 'client') {
+            jsonError(403, 'Forbidden', 'FORBIDDEN');
+        }
+
+        $userId = (int) $auth['user_id'];
+
         $data = requestJsonBody();
         $errors = [];
 
