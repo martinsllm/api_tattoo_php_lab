@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Repositories\ArtistImageRepository;
 use App\Repositories\ArtistRepository;
+use App\Services\JwtService;
 use App\Services\UploadService;
 
 class ArtistImageController
@@ -14,10 +15,14 @@ class ArtistImageController
         private ArtistImageRepository $artistImageRepository,
         private ArtistRepository $artistRepository,
         private UploadService $uploadService,
-    ){}
+        private JwtService $jwtService,
+    ) {
+    }
 
     public function index(array $params): void
     {
+        \requireAuth($this->jwtService);
+        
         $id = (int) $params['id'];
 
         if($this->artistRepository->show($id) === false) {
@@ -31,6 +36,8 @@ class ArtistImageController
 
     public function show(array $params): void
     {
+        \requireAuth($this->jwtService);
+        
         $id = (int) $params['id'];
         $artistImage = $this->artistImageRepository->show($id);
 
@@ -54,6 +61,8 @@ class ArtistImageController
 
     public function store(array $params): void
     {
+        \requireAuth($this->jwtService);
+        
         $artistId = (int) $params['id'];
         if ($this->artistRepository->show($artistId) === false) {
             jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');

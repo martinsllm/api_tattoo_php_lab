@@ -6,22 +6,27 @@ namespace App\Controllers;
 
 use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
+use App\Services\JwtService;
 
 class ReviewController
 {
     public function __construct(
         private ReviewRepository $reviewRepository,
         private ArtistRepository $artistRepository,
+        private JwtService $jwtService,
     ) {
     }
 
     public function index(array $params): void
     {
+        \requireAuth($this->jwtService);
         jsonSuccess(200, $this->reviewRepository->index());
     }
 
     public function show(array $params): void
     {
+        \requireAuth($this->jwtService);
+
         $id = (int) $params['id'];
         $review = $this->reviewRepository->show($id);
 
@@ -34,6 +39,8 @@ class ReviewController
 
     public function store(array $params): void
     {
+        \requireAuth($this->jwtService);
+        
         $data = requestJsonBody();
         $errors = [];
 

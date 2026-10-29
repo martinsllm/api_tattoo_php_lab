@@ -13,8 +13,8 @@ function routeHandlers(AppContext $app): array
 {
     $artistController = new ArtistController($app->artistRepository);
     $healthController = new HealthController();
-    $reviewController = new ReviewController($app->reviewRepository, $app->artistRepository);
-    $artistImageController = new ArtistImageController($app->artistImageRepository, $app->artistRepository, $app->uploadService);
+    $reviewController = new ReviewController($app->reviewRepository, $app->artistRepository, $app->jwtService);
+    $artistImageController = new ArtistImageController($app->artistImageRepository, $app->artistRepository, $app->uploadService, $app->jwtService);
     $authController = new AuthController($app->userRepository, $app->jwtService);
 
     return [
