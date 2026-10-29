@@ -61,11 +61,17 @@ class ArtistImageController
 
     public function store(array $params): void
     {
-        \requireAuth($this->jwtService);
-        
+        $auth = \requireAuth($this->jwtService);
+
         $artistId = (int) $params['id'];
-        if ($this->artistRepository->show($artistId) === false) {
+        $artist = $this->artistRepository->show($artistId);
+
+        if ($artist === false) {
             jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+        }
+
+        if ($auth['role'] !== 'artist' || $auth['user_id'] !== (int) $artist['user_id']) {
+            jsonError(403, 'Forbidden', 'FORBIDDEN');
         }
 
         $items = $this->uploadService->normalizeFiles('images', $_FILES);
