@@ -114,7 +114,26 @@ Base URL: `http://127.0.0.1:8081`
 
 Login: `POST /auth/login` com JSON `email` e `password` → resposta inclui `token`. Demais rotas protegidas: header `Authorization: Bearer <token>`.
 
-Erros JSON: `{ "error": { "message", "code", "errors?" } }`. Sucesso: `{ "data": ... }`.
+Erros JSON: `{ "error": { "message", "code", "errors?" } }`. Sucesso: `{ "data": ... }`. Detalhes em [`docs/json-contract.md`](docs/json-contract.md).
+
+---
+
+## PSRs neste lab
+
+O projeto segue [PHP-FIG PSRs](https://www.php-fig.org/psr/) onde faz sentido para um lab **PHP nativo** (sem virar Symfony). Objetivo: comparar depois com Laravel, que implementa ideias parecidas com nomes diferentes.
+
+| PSR | Tema | Neste repositório |
+|-----|------|-------------------|
+| **PSR-4** | Autoload (namespace → pasta) | **Em uso** — `composer.json` mapeia `App\` → `src/` |
+| **PSR-12** | Estilo de código | Parcialmente na mão; ferramenta (`composer lint`) prevista no backlog **#13** |
+| **PSR-11** | Container de DI (`ContainerInterface`) | **Planejado (Sprint 3, #18)** — hoje wiring manual em `bootstrap/app.php` + `handlers.php` (`AppContext`, vários `new …`) |
+| **PSR-7** | Mensagens HTTP (Request / Response) | **Planejado (#19)** — hoje `$_SERVER`, `$_FILES`, `requestJsonBody()` e helpers que respondem com `exit` |
+| **PSR-15** | Middleware + request handler | **Planejado (#20)** — hoje `\requireAuth()` no início de métodos de controller |
+| **PSR-15 (HTTP)** vs item **#15** do sprint | — | O backlog **#15** fala de **FastRoute vs `Router` caseiro**; não confundir com middleware PSR-15 |
+
+**Por que não PSR-7/11/15 desde o início?** De propósito: ver rotas, PDO, validação e JSON sem camadas extras. A API REST e o contrato JSON permanecem os mesmos enquanto a Sprint 3 migra **aos poucos** (ordem: **11 → 7 → 15**).
+
+**Equivalente mental no Laravel (referência):** PSR-4 ≈ autoload Composer; PSR-11 ≈ service container; PSR-7 ≈ `Request` / `Response`; PSR-15 ≈ middleware (`auth`, etc.) antes do controller.
 
 ---
 
