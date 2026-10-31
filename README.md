@@ -126,12 +126,12 @@ O projeto segue [PHP-FIG PSRs](https://www.php-fig.org/psr/) onde faz sentido pa
 |-----|------|-------------------|
 | **PSR-4** | Autoload (namespace → pasta) | **Em uso** — `composer.json` mapeia `App\` → `src/` |
 | **PSR-12** | Estilo de código | Parcialmente na mão; ferramenta (`composer lint`) prevista no backlog **#13** |
-| **PSR-11** | Container de DI (`ContainerInterface`) | **Planejado (Sprint 3, #18)** — hoje wiring manual em `bootstrap/app.php` + `handlers.php` (`AppContext`, vários `new …`) |
+| **PSR-11** | Container de DI (`ContainerInterface`) | **Em uso** — [PHP-DI](https://php-di.org/) em `bootstrap/container.php`; `app.php` monta o container e `handlers.php` resolve controllers com `$container->get(...)` |
 | **PSR-7** | Mensagens HTTP (Request / Response) | **Planejado (#19)** — hoje `$_SERVER`, `$_FILES`, `requestJsonBody()` e helpers que respondem com `exit` |
 | **PSR-15** | Middleware + request handler | **Planejado (#20)** — hoje `\requireAuth()` no início de métodos de controller |
 | **PSR-15 (HTTP)** vs item **#15** do sprint | — | O backlog **#15** fala de **FastRoute vs `Router` caseiro**; não confundir com middleware PSR-15 |
 
-**Por que não PSR-7/11/15 desde o início?** De propósito: ver rotas, PDO, validação e JSON sem camadas extras. A API REST e o contrato JSON permanecem os mesmos enquanto a Sprint 3 migra **aos poucos** (ordem: **11 → 7 → 15**).
+**Por que não PSR-7/15 desde o início?** De propósito: ver rotas, PDO, validação e JSON sem abstrair HTTP de uma vez. A API REST e o contrato JSON permanecem os mesmos enquanto a Sprint 3 evolui (**PSR-11 ✅**; próximo **PSR-7 → PSR-15**).
 
 **Equivalente mental no Laravel (referência):** PSR-4 ≈ autoload Composer; PSR-11 ≈ service container; PSR-7 ≈ `Request` / `Response`; PSR-15 ≈ middleware (`auth`, etc.) antes do controller.
 
@@ -140,7 +140,7 @@ O projeto segue [PHP-FIG PSRs](https://www.php-fig.org/psr/) onde faz sentido pa
 ## Estrutura
 
 - `public/index.php` — front controller
-- `bootstrap/` — env, HTTP, auth, app, handlers
+- `bootstrap/` — env, HTTP, auth, **container** (PSR-11), app, handlers
 - `src/` — controllers, repositories, routing, services
 - `database/schema.sql` — snapshot do schema
 - `database/seeds/` — dados de dev

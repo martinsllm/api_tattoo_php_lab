@@ -12,6 +12,10 @@ use App\Repositories\ArtistImageRepository;
 use App\Services\JwtService;
 use App\Services\UploadService;
 use App\Controllers\HealthController;
+use App\Controllers\ArtistController;
+use App\Controllers\AuthController;
+use App\Controllers\ReviewController;
+use App\Controllers\ArtistImageController;
 
 function buildContainer(): ContainerInterface
 {
@@ -46,7 +50,19 @@ function buildContainer(): ContainerInterface
         ),
 
         HealthController::class => \DI\create(HealthController::class),
+
         
+        ArtistController::class => \DI\create(ArtistController::class)
+            ->constructor(\DI\get(ArtistRepository::class)),
+
+        AuthController::class => \DI\create(AuthController::class)
+            ->constructor(\DI\get(UserRepository::class), \DI\get(JwtService::class)),
+
+        ReviewController::class => \DI\create(ReviewController::class)
+            ->constructor(\DI\get(ReviewRepository::class), \DI\get(ArtistRepository::class), \DI\get(JwtService::class)),
+
+        ArtistImageController::class => \DI\create(ArtistImageController::class)
+            ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(JwtService::class)),
     ]);
 
     return $builder->build();

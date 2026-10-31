@@ -2,33 +2,26 @@
 
 declare(strict_types=1);
 
-use App\AppContext;
-use App\Controllers\ArtistController;
+use Psr\Container\ContainerInterface;
 use App\Controllers\HealthController;
+use App\Controllers\ArtistController;
 use App\Controllers\ReviewController;
 use App\Controllers\ArtistImageController;
 use App\Controllers\AuthController;
-use Psr\Container\ContainerInterface;
 
-function routeHandlers(AppContext $app, ContainerInterface $container): array
+function routeHandlers(ContainerInterface $container): array
 {
-    $artistController = new ArtistController($app->artistRepository);
-    $healthController = new HealthController();
-    $reviewController = new ReviewController($app->reviewRepository, $app->artistRepository, $app->jwtService);
-    $artistImageController = new ArtistImageController($app->artistImageRepository, $app->artistRepository, $app->uploadService, $app->jwtService);
-    $authController = new AuthController($app->userRepository, $app->jwtService);
-
     return [
         'health' => [$container->get(HealthController::class), 'index'],
-        'artist.index' => [$artistController, 'index'],
-        'artist.show' => [$artistController, 'show'],
-        'review.store' => [$reviewController, 'store'],
-        'review.index' => [$reviewController, 'index'],
-        'review.show' => [$reviewController, 'show'],
-        'artist-image.store' => [$artistImageController, 'store'],
-        'artist-image.show' => [$artistImageController, 'show'],
-        'artist-image.index' => [$artistImageController, 'index'],
-        'auth.register' => [$authController, 'register'],
-        'auth.login' => [$authController, 'login']
+        'artist.index' => [$container->get(ArtistController::class), 'index'],
+        'artist.show' => [$container->get(ArtistController::class), 'show'],
+        'review.store' => [$container->get(ReviewController::class), 'store'],
+        'review.index' => [$container->get(ReviewController::class), 'index'],
+        'review.show' => [$container->get(ReviewController::class), 'show'],
+        'artist-image.store' => [$container->get(ArtistImageController::class), 'store'],
+        'artist-image.show' => [$container->get(ArtistImageController::class), 'show'],
+        'artist-image.index' => [$container->get(ArtistImageController::class), 'index'],
+        'auth.register' => [$container->get(AuthController::class), 'register'],
+        'auth.login' => [$container->get(AuthController::class), 'login']
     ];
 }
