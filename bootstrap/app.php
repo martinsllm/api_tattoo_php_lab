@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/container.php';
+
 use App\AppContext;
 use App\Database\Connection;
 use App\Repositories\ArtistRepository;
@@ -24,7 +26,8 @@ $context = new AppContext(
     new JwtService(env('JWT_SECRET'), (int) env('JWT_TTL', '3600')),
 );
 
-$handlers = routeHandlers($context);
+$container = buildContainer();
+$handlers = routeHandlers($context, $container);
 
 $routes = require __DIR__ . '/../src/Routing/routes.php';
 $router = new Router($routes);

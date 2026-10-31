@@ -11,6 +11,7 @@ use App\Repositories\ReviewRepository;
 use App\Repositories\ArtistImageRepository;
 use App\Services\JwtService;
 use App\Services\UploadService;
+use App\Controllers\HealthController;
 
 function buildContainer(): ContainerInterface
 {
@@ -43,6 +44,8 @@ function buildContainer(): ContainerInterface
         UploadService::class => \DI\create(UploadService::class)->constructor(
             dirname(__DIR__) . '/storage/uploads',
         ),
+
+        HealthController::class => \DI\create(HealthController::class),
         
     ]);
 

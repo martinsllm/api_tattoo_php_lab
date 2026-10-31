@@ -8,8 +8,9 @@ use App\Controllers\HealthController;
 use App\Controllers\ReviewController;
 use App\Controllers\ArtistImageController;
 use App\Controllers\AuthController;
+use Psr\Container\ContainerInterface;
 
-function routeHandlers(AppContext $app): array
+function routeHandlers(AppContext $app, ContainerInterface $container): array
 {
     $artistController = new ArtistController($app->artistRepository);
     $healthController = new HealthController();
@@ -18,7 +19,7 @@ function routeHandlers(AppContext $app): array
     $authController = new AuthController($app->userRepository, $app->jwtService);
 
     return [
-        'health' => [$healthController, 'index'],
+        'health' => [$container->get(HealthController::class), 'index'],
         'artist.index' => [$artistController, 'index'],
         'artist.show' => [$artistController, 'show'],
         'review.store' => [$reviewController, 'store'],
