@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Repositories\UserRepository;
 use App\Services\JwtService;
+use Psr\Http\Message\ResponseInterface;
 
 class AuthController
 {
@@ -13,7 +14,7 @@ class AuthController
     {
     }
 
-    public function register(array $params)
+    public function register(array $params): ResponseInterface
     {
         $data = requestJsonBody();
         $errors = [];
@@ -41,11 +42,11 @@ class AuthController
         }
 
         if ($errors !== []) {
-            jsonError(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
+            return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
         }
 
         if($this->userRepository->findByEmail($data['email'])) {
-            jsonError(409, 'Email already exists.', 'EMAIL_ALREADY_EXISTS');
+            return jsonErrorResponse(409, 'Email already exists.', 'EMAIL_ALREADY_EXISTS');
         }
 
         $user = $this->userRepository->create([
@@ -55,10 +56,10 @@ class AuthController
             'role' => $data['role'] ?? 'client',
         ]);
 
-        jsonSuccess(201, $user);
+        return jsonResponse(201, $user);
     }
 
-    public function login(array $params)
+    public function login(array $params): ResponseInterface
     {
         $data = requestJsonBody();
         $errors = [];
@@ -72,22 +73,22 @@ class AuthController
         }
 
         if ($errors !== []) {
-            jsonError(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
+            return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
         }
         
         $user = $this->userRepository->findByEmail($data['email']);
 
         if (!$user) {
-            jsonError(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+            return jsonErrorResponse(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
         }
 
         if (!password_verify($data['password'], $user['password_hash'])) {
-            jsonError(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+            return jsonErrorResponse(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
         }
 
         unset($user['password_hash']);
         $token = $this->jwtService->issue($user['id'], $user['role']);
-        jsonSuccess(200, [
+        return jsonResponse(200, [
             'user' => $user,
             'token' => $token,
         ]);

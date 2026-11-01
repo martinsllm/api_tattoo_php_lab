@@ -39,13 +39,13 @@ function requireAuth(JwtService $jwt): array
 {
     $token = bearerToken();
     if ($token === null) {
-        jsonError(401, 'Unauthorized', 'UNAUTHORIZED');
+        emitResponse(jsonErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED'));
     }
 
     try {
         $decoded = $jwt->decode($token);
     } catch (ExpiredException|SignatureInvalidException|\UnexpectedValueException) {
-        jsonError(401, 'Unauthorized', 'UNAUTHORIZED');
+        emitResponse(jsonErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED'));
     }
 
     return [

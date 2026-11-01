@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
 use App\Services\JwtService;
+use Psr\Http\Message\ResponseInterface;
 
 class ReviewController
 {
@@ -17,13 +18,13 @@ class ReviewController
     ) {
     }
 
-    public function index(array $params): void
+    public function index(array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
-        jsonSuccess(200, $this->reviewRepository->index());
+        return jsonResponse(200, $this->reviewRepository->index());
     }
 
-    public function show(array $params): void
+    public function show(array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
 
@@ -31,18 +32,18 @@ class ReviewController
         $review = $this->reviewRepository->show($id);
 
         if ($review !== false) {
-            jsonSuccess(200, $review);
+            return jsonResponse(200, $review);
         } 
 
-        jsonError(404, 'Review not found', 'REVIEW_NOT_FOUND');
+        return jsonErrorResponse(404, 'Review not found', 'REVIEW_NOT_FOUND');
     }
 
-    public function store(array $params): void
+    public function store(array $params): ResponseInterface
     {
         $auth = \requireAuth($this->jwtService);
         
         if ($auth['role'] !== 'client') {
-            jsonError(403, 'Forbidden', 'FORBIDDEN');
+            return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
         }
 
         $userId = (int) $auth['user_id'];
@@ -88,7 +89,7 @@ class ReviewController
         }
 
         if ($errors !== []) {
-            jsonError(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
+            return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
         }
 
         $review = $this->reviewRepository->create([
@@ -97,6 +98,6 @@ class ReviewController
             'comment' => $comment,
         ]);
 
-        jsonSuccess(201, $review);
+        return jsonResponse(201, $review);
     }
 }

@@ -14,14 +14,6 @@ function requestPath(): string
     return $path === '' ? '/' : $path;
 }
 
-function sendJsonResponse(int $status, array $data): void
-{
-    http_response_code($status);
-    header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($data, JSON_THROW_ON_ERROR);
-    exit;
-}
-
 function jsonResponse(int $status, array $data): ResponseInterface
 {
     $stream = Stream::create(json_encode(['data' => $data], JSON_THROW_ON_ERROR));
@@ -30,12 +22,7 @@ function jsonResponse(int $status, array $data): ResponseInterface
     ], $stream);
 }
 
-function jsonSuccess(int $status, mixed $data): void
-{
-    sendJsonResponse($status, ['data' => $data]);
-}
-
-function jsonError(int $status, string $message, string $code, ?array $fiedldErrors = null): void
+function jsonErrorResponse(int $status, string $message, string $code, ?array $fiedldErrors = null): ResponseInterface
 {
     $error = [
         'message' => $message,
@@ -45,8 +32,25 @@ function jsonError(int $status, string $message, string $code, ?array $fiedldErr
     if ($fiedldErrors !== null) {
         $error['errors'] = $fiedldErrors;
     }
+    
+    $payload = ['error' => $error];
+    
+    $stream = Stream::create(json_encode($payload, JSON_THROW_ON_ERROR));
+    return new Response($status, [
+        'Content-Type' => 'application/json; charset=utf-8',
+    ], $stream);
+}
 
-    sendJsonResponse($status, ['error' => $error]);
+function emitResponse(ResponseInterface $response): void
+{
+    http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+        foreach ($values as $value) {
+            header("{$name}: {$value}", replace: false);
+        }
+    }
+    echo $response->getBody()->getContents();
+    exit;
 }
 
 function requestJsonBody(): array
@@ -60,11 +64,11 @@ function requestJsonBody(): array
     try {
         $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
     } catch (JsonException) {
-        jsonError(400, 'Invalid JSON body', 'INVALID_JSON');
+        emitResponse(jsonErrorResponse(400, 'Invalid JSON body', 'INVALID_JSON'));
     }
 
     if (!is_array($decoded)) {
-        jsonError(400, 'JSON body must be an object', 'INVALID_JSON');
+        emitResponse(jsonErrorResponse(400, 'JSON body must be an object', 'INVALID_JSON'));
     }
 
     return $decoded;

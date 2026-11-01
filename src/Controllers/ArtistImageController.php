@@ -8,6 +8,9 @@ use App\Repositories\ArtistImageRepository;
 use App\Repositories\ArtistRepository;
 use App\Services\JwtService;
 use App\Services\UploadService;
+use Psr\Http\Message\ResponseInterface;
+use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Stream;
 
 class ArtistImageController
 {
@@ -19,22 +22,22 @@ class ArtistImageController
     ) {
     }
 
-    public function index(array $params): void
+    public function index(array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
         
         $id = (int) $params['id'];
 
         if($this->artistRepository->show($id) === false) {
-            jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+            return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
         }
 
         $images = $this->artistImageRepository->index($id);
 
-        jsonSuccess(200, $images);
+        return jsonResponse(200, $images);
     }
 
-    public function show(array $params): void
+    public function show(array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
         
@@ -42,24 +45,24 @@ class ArtistImageController
         $artistImage = $this->artistImageRepository->show($id);
 
         if ($artistImage === false) {
-            jsonError(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+            return jsonErrorResponse(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
         }
 
         $root = rtrim($this->uploadService->uploadsRoot(), '/');
         $path = $root . '/' . $artistImage['stored_path'];
 
         if (!is_file($path)) {
-            jsonError(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+            return jsonErrorResponse(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
         }
 
-        http_response_code(200);
-        header('Content-Type: ' . $artistImage['mime_type']);
-        header('Content-Length: ' . (string) filesize($path));
-        readfile($path);
-        exit;
+        $stream = Stream::create(fopen($path, 'rb'));
+        return new Response(200, [
+            'Content-Type' => $artistImage['mime_type'],
+            'Content-Length' => (string) filesize($path),
+        ], $stream);
     }
 
-    public function store(array $params): void
+    public function store(array $params): ResponseInterface
     {
         $auth = \requireAuth($this->jwtService);
 
@@ -67,16 +70,16 @@ class ArtistImageController
         $artist = $this->artistRepository->show($artistId);
 
         if ($artist === false) {
-            jsonError(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+            return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
         }
 
         if ($auth['role'] !== 'artist' || $auth['user_id'] !== (int) $artist['user_id']) {
-            jsonError(403, 'Forbidden', 'FORBIDDEN');
+            return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
         }
 
         $items = $this->uploadService->normalizeFiles('images', $_FILES);
         if ($items === []) {
-            jsonError(422, 'Validation failed', 'VALIDATION_ERROR', [
+            return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', [
                 'images' => ['At least one image is required.'],
             ]);
         }
@@ -86,11 +89,11 @@ class ArtistImageController
             try {
                 $stored = $this->uploadService->uploadFile($artistId, $file);
             } catch (\InvalidArgumentException $e) {
-                jsonError(422, 'Validation failed', 'VALIDATION_ERROR', [
+                return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', [
                     'images' => [$e->getMessage()],
                 ]);
             } catch (\RuntimeException) {
-                jsonError(500, 'Could not save upload', 'UPLOAD_FAILED');
+                return jsonErrorResponse(500, 'Could not save upload', 'UPLOAD_FAILED');
             }
 
             $created[] = $this->artistImageRepository->create([
@@ -102,6 +105,6 @@ class ArtistImageController
             ]);
         }
 
-        jsonSuccess(201, $created);
+        return jsonResponse(201, $created);
     }
 }
