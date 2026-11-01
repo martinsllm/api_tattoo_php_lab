@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Stream;
+use Psr\Http\Message\ResponseInterface;
+
 function requestPath(): string
 {
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -16,6 +20,14 @@ function sendJsonResponse(int $status, array $data): void
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode($data, JSON_THROW_ON_ERROR);
     exit;
+}
+
+function jsonResponse(int $status, array $data): ResponseInterface
+{
+    $stream = Stream::create(json_encode(['data' => $data], JSON_THROW_ON_ERROR));
+    return new Response($status, [
+        'Content-Type' => 'application/json; charset=utf-8',
+    ], $stream);
 }
 
 function jsonSuccess(int $status, mixed $data): void

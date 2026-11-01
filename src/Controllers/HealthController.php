@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use Psr\Http\Message\ResponseInterface;
+
 class HealthController
 {
-    public function index(): void
+    public function index(array $params): ResponseInterface
     {
-        jsonSuccess(200, ['ok' => true]);
+        return jsonResponse(200, ['ok' => true]);
     }
 }

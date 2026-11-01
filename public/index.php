@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Psr\Http\Message\ResponseInterface;
+
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../bootstrap/env.php';
 require __DIR__ . '/../bootstrap/http.php';
@@ -27,4 +29,14 @@ if (!isset($app['handlers'][$handler])) {
     jsonError(404, 'Not Found', 'HANDLER_NOT_FOUND');
 }
 
-$app['handlers'][$handler]($route['params']);
+$result = $app['handlers'][$handler]($route['params']);
+
+if ($result instanceof ResponseInterface) {
+    http_response_code($result->getStatusCode());
+    foreach ($result->getHeaders() as $name => $values) {
+        foreach ($values as $value) {
+            header("{$name}: {$value}");
+        }
+    }
+    echo $result->getBody()->getContents();
+} 
