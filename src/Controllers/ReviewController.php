@@ -21,13 +21,13 @@ class ReviewController
 
     public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        \requireAuth($this->jwtService);
+        \requireAuth($request, $this->jwtService);
         return jsonResponse(200, $this->reviewRepository->index());
     }
 
     public function show(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        \requireAuth($this->jwtService);
+        \requireAuth($request, $this->jwtService);
 
         $id = (int) $params['id'];
         $review = $this->reviewRepository->show($id);
@@ -41,7 +41,7 @@ class ReviewController
 
     public function store(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $auth = \requireAuth($this->jwtService);
+        $auth = \requireAuth($request, $this->jwtService);
         
         if ($auth['role'] !== 'client') {
             return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
@@ -49,7 +49,7 @@ class ReviewController
 
         $userId = (int) $auth['user_id'];
 
-        $data = requestJsonBody();
+        $data = requestJsonBody($request);
         $errors = [];
 
         $artistId = null;

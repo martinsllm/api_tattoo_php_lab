@@ -54,11 +54,11 @@ function emitResponse(ResponseInterface $response): void
     exit;
 }
 
-function requestJsonBody(): array
+function requestJsonBody(ServerRequestInterface $request): array
 {
-    $raw = file_get_contents('php://input');
+    $raw = (string) $request->getBody();
 
-    if ($raw === false || trim($raw) === '') {
+    if (trim($raw) === '') {
         return [];
     }
 

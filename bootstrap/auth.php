@@ -5,24 +5,11 @@ declare(strict_types=1);
 use App\Services\JwtService;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
+use Psr\Http\Message\ServerRequestInterface;
 
-function bearerToken(): ?string
+function bearerToken(ServerRequestInterface $request): ?string
 {
-    $header = $_SERVER['HTTP_AUTHORIZATION']
-        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
-        ?? '';
-
-    if ($header === '' && function_exists('getallheaders')) {
-        $headers = getallheaders();
-        if (is_array($headers)) {
-            foreach ($headers as $name => $value) {
-                if (strcasecmp((string) $name, 'Authorization') === 0) {
-                    $header = (string) $value;
-                    break;
-                }
-            }
-        }
-    }
+    $header = $request->getHeaderLine('Authorization');
 
     if ($header === '') {
         return null;
@@ -35,9 +22,9 @@ function bearerToken(): ?string
     return $matches[1];
 }
 
-function requireAuth(JwtService $jwt): array
+function requireAuth(ServerRequestInterface $request, JwtService $jwt): array
 {
-    $token = bearerToken();
+    $token = bearerToken($request);
     if ($token === null) {
         emitResponse(jsonErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED'));
     }

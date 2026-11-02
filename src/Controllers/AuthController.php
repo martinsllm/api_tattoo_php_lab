@@ -17,7 +17,7 @@ class AuthController
 
     public function register(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $data = requestJsonBody();
+        $data = requestJsonBody($request);
         $errors = [];
 
         if (!array_key_exists('email', $data) || $data['email'] === '' || $data['email'] === null) {
@@ -62,7 +62,7 @@ class AuthController
 
     public function login(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $data = requestJsonBody();
+        $data = requestJsonBody($request);
         $errors = [];
 
         if (!array_key_exists('email', $data) || $data['email'] === '' || $data['email'] === null) {

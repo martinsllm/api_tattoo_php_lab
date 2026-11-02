@@ -25,7 +25,7 @@ class ArtistImageController
 
     public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        \requireAuth($this->jwtService);
+        \requireAuth($request, $this->jwtService);
         
         $id = (int) $params['id'];
 
@@ -40,7 +40,7 @@ class ArtistImageController
 
     public function show(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        \requireAuth($this->jwtService);
+        \requireAuth($request, $this->jwtService);
         
         $id = (int) $params['id'];
         $artistImage = $this->artistImageRepository->show($id);
@@ -65,7 +65,7 @@ class ArtistImageController
 
     public function store(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $auth = \requireAuth($this->jwtService);
+        $auth = \requireAuth($request, $this->jwtService);
 
         $artistId = (int) $params['id'];
         $artist = $this->artistRepository->show($artistId);
