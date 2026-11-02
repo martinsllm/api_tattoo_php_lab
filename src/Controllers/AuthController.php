@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Repositories\UserRepository;
 use App\Services\JwtService;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AuthController
 {
@@ -14,7 +15,7 @@ class AuthController
     {
     }
 
-    public function register(array $params): ResponseInterface
+    public function register(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $data = requestJsonBody();
         $errors = [];
@@ -59,7 +60,7 @@ class AuthController
         return jsonResponse(201, $user);
     }
 
-    public function login(array $params): ResponseInterface
+    public function login(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $data = requestJsonBody();
         $errors = [];

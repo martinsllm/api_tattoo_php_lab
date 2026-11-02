@@ -10,8 +10,10 @@ require __DIR__ . '/../bootstrap/handlers.php';
 
 loadEnv(__DIR__ . '/../.env');
 
-$method = $_SERVER['REQUEST_METHOD'];
-$path = requestPath();
+$request = createServerRequest();
+
+$method = $request->getMethod();
+$path = requestPath($request);
 
 $app = require __DIR__ . '/../bootstrap/app.php';
 
@@ -27,6 +29,6 @@ if (!isset($app['handlers'][$handler])) {
     emitResponse(jsonErrorResponse(404, 'Not Found', 'HANDLER_NOT_FOUND'));
 }
 
-$response = $app['handlers'][$handler]($route['params']);
+$response = $app['handlers'][$handler]($request, $route['params']);
 emitResponse($response);
 

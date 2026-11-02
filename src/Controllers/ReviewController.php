@@ -8,6 +8,7 @@ use App\Repositories\ArtistRepository;
 use App\Repositories\ReviewRepository;
 use App\Services\JwtService;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ReviewController
 {
@@ -18,13 +19,13 @@ class ReviewController
     ) {
     }
 
-    public function index(array $params): ResponseInterface
+    public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
         return jsonResponse(200, $this->reviewRepository->index());
     }
 
-    public function show(array $params): ResponseInterface
+    public function show(ServerRequestInterface $request, array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
 
@@ -38,7 +39,7 @@ class ReviewController
         return jsonErrorResponse(404, 'Review not found', 'REVIEW_NOT_FOUND');
     }
 
-    public function store(array $params): ResponseInterface
+    public function store(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $auth = \requireAuth($this->jwtService);
         

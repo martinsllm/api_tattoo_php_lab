@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-function requestPath(): string
+function requestPath(ServerRequestInterface $request): string
 {
-    $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $path = rtrim($path, '/');
-    
+    $path = rtrim($request->getUri()->getPath(), '/');
     return $path === '' ? '/' : $path;
 }
 
@@ -72,4 +73,11 @@ function requestJsonBody(): array
     }
 
     return $decoded;
+}
+
+function createServerRequest(): ServerRequestInterface
+{
+    $factory = new Psr17Factory();
+    $creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
+    return $creator->fromGlobals();
 }

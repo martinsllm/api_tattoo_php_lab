@@ -11,6 +11,7 @@ use App\Services\UploadService;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ArtistImageController
 {
@@ -22,7 +23,7 @@ class ArtistImageController
     ) {
     }
 
-    public function index(array $params): ResponseInterface
+    public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
         
@@ -37,7 +38,7 @@ class ArtistImageController
         return jsonResponse(200, $images);
     }
 
-    public function show(array $params): ResponseInterface
+    public function show(ServerRequestInterface $request, array $params): ResponseInterface
     {
         \requireAuth($this->jwtService);
         
@@ -62,7 +63,7 @@ class ArtistImageController
         ], $stream);
     }
 
-    public function store(array $params): ResponseInterface
+    public function store(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $auth = \requireAuth($this->jwtService);
 

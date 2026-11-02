@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Repositories\ArtistRepository;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class ArtistController
 {
@@ -13,12 +14,12 @@ class ArtistController
     public function __construct(private ArtistRepository $artistRepository)
     {}
 
-    public function index(array $params): ResponseInterface
+    public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
         return jsonResponse(200, $this->artistRepository->index());
     }
 
-    public function show(array $params): ResponseInterface
+    public function show(ServerRequestInterface $request, array $params): ResponseInterface
     {
         $id = (int) $params['id'];
         $artist = $this->artistRepository->show($id);
