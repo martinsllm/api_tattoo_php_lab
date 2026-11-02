@@ -78,7 +78,7 @@ class ArtistImageController
             return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
         }
 
-        $items = $this->uploadService->normalizeFiles('images', $_FILES);
+        $items = $this->uploadService->normalizeFiles('images', requestFilesBag($request));
         if ($items === []) {
             return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', [
                 'images' => ['At least one image is required.'],
