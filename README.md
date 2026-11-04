@@ -127,11 +127,11 @@ O projeto segue [PHP-FIG PSRs](https://www.php-fig.org/psr/) onde faz sentido pa
 | **PSR-4** | Autoload (namespace → pasta) | **Em uso** — `composer.json` mapeia `App\` → `src/` |
 | **PSR-12** | Estilo de código | Parcialmente na mão; ferramenta (`composer lint`) prevista no backlog **#13** |
 | **PSR-11** | Container de DI (`ContainerInterface`) | **Em uso** — [PHP-DI](https://php-di.org/) em `bootstrap/container.php`; `app.php` monta o container e `handlers.php` resolve controllers com `$container->get(...)` |
-| **PSR-7** | Mensagens HTTP (Request / Response) | **Em uso (parcial, #19)** — Nyholm; controllers retornam `ResponseInterface` (`jsonResponse` / `jsonErrorResponse`); `emitResponse()` no `index`. Entrada ainda sem `ServerRequest` (`$_SERVER`, `requestJsonBody()`, `$_FILES`) |
-| **PSR-15** | Middleware + request handler | **Planejado (#20)** — hoje `\requireAuth()` no início de métodos de controller |
+| **PSR-7** | Mensagens HTTP (Request / Response) | **Em uso (#19, #21)** — Nyholm; `ServerRequest` + `ResponseInterface`; `requestJsonBody($request)`, `requestFilesBag($request)`; `emitResponse()` no `index` |
+| **PSR-15** | Middleware + request handler | **Em uso (#20)** — `MiddlewarePipeline`, `CallableRequestHandler`, `AuthMiddleware` nas rotas protegidas; `user_id` / `role` em atributos do request |
 | **PSR-15 (HTTP)** vs item **#15** do sprint | — | O backlog **#15** fala de **FastRoute vs `Router` caseiro**; não confundir com middleware PSR-15 |
 
-**Por que não PSR-7/15 desde o início?** De propósito: ver rotas, PDO, validação e JSON sem abstrair HTTP de uma vez. A API REST e o contrato JSON permanecem os mesmos enquanto a Sprint 3 evolui (**PSR-11 ✅**, **PSR-7** resposta ✅ / request pendente; próximo **PSR-15**).
+**Por que não PSR-7/15 desde o início?** De propósito: ver rotas, PDO, validação e JSON sem abstrair HTTP de uma vez. Sprint 3 (PSR **11 → 7 → 15**) concluída no núcleo; API REST e contrato JSON iguais no Insomnia.
 
 **Equivalente mental no Laravel (referência):** PSR-4 ≈ autoload Composer; PSR-11 ≈ service container; PSR-7 ≈ `Request` / `Response`; PSR-15 ≈ middleware (`auth`, etc.) antes do controller.
 

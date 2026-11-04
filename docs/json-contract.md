@@ -136,14 +136,13 @@ Respostas JSON seguem [PSR-7](https://www.php-fig.org/psr/psr-7/) via [Nyholm/ps
 | `jsonResponse(int $status, array $data)` | `ResponseInterface` | Sucesso 2xx — corpo `{ "data": … }` |
 | `jsonErrorResponse(int $status, string $message, string $code, ?array $fieldErrors = null)` | `ResponseInterface` | Erro 4xx/5xx — corpo `{ "error": … }`; `$fieldErrors` vira `error.errors` (422) |
 | `emitResponse(ResponseInterface $response)` | `void` (termina com `exit`) | Envia status, headers e body ao SAPI (PHP built-in server, FPM, etc.) |
-| `requestJsonBody(): array` | `array` | Lê `php://input`, decodifica JSON; body vazio → `[]`; JSON inválido ou não-objeto → `emitResponse` com **400** `INVALID_JSON` |
+| `requestJsonBody(ServerRequestInterface $request): array` | `array` | Body JSON do request PSR-7; inválido → **400** `INVALID_JSON` |
+| `requestFilesBag(ServerRequestInterface $request): array` | `array` | Uploads via `getUploadedFiles()` (`bootstrap/uploads.php`) |
 
 ### Fluxo
 
-1. **`public/index.php`** — roteamento; 404 de rota/handler com `emitResponse(jsonErrorResponse(...))`; demais rotas: `$response = $handler(...); emitResponse($response)`.
-2. **Controllers** — `return jsonResponse(...)` ou `return jsonErrorResponse(...)` (não chamam `emitResponse` diretamente).
-3. **`bootstrap/auth.php`** — `requireAuth()` devolve `array` com `user_id` e `role`; falha de token → `emitResponse(jsonErrorResponse(401, …, 'UNAUTHORIZED'))`.
-
-Entrada HTTP ainda usa `$_SERVER`, headers e `requestJsonBody()` (sem `ServerRequestInterface` — previsto na continuação do #19).
+1. **`public/index.php`** — `createServerRequest()`; roteamento; 404 com `emitResponse(jsonErrorResponse(...))`; rotas protegidas passam por **`AuthMiddleware`** (PSR-15); `$response = $pipeline->handle($request)`; `emitResponse($response)`.
+2. **Controllers** — `return jsonResponse(...)` ou `return jsonErrorResponse(...)`; rotas autenticadas leem **`$request->getAttribute('user_id')`** e **`role`** (403 no handler quando aplicável).
+3. **`App\Http\AuthMiddleware`** — JWT Bearer; **401** retorna `jsonErrorResponse` (sem `emitResponse`); sucesso enriquece o request com atributos.
 
 Respostas **não JSON** (ex.: imagem em `GET /artist-images/{id}`) usam `Response` com `Content-Type` e stream do arquivo; o mesmo `emitResponse` no `index`.
