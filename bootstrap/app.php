@@ -13,6 +13,7 @@ $routes = require __DIR__ . '/../src/Routing/routes.php';
 $router = new Router($routes);
 
 return [
+    'container' => $container,
     'handlers' => $handlers,
     'router' => $router,
 ];

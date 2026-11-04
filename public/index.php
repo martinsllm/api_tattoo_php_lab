@@ -11,7 +11,7 @@ require __DIR__ . '/../bootstrap/handlers.php';
 
 use App\Http\CallableRequestHandler;
 use App\Http\MiddlewarePipeline;
-use App\Http\PassThroughMiddleware;
+use App\Http\AuthMiddleware;
 
 loadEnv(__DIR__ . '/../.env');
 
@@ -28,16 +28,26 @@ if ($route === null) {
     emitResponse(jsonErrorResponse(404, 'Not Found', 'ROUTE_NOT_FOUND'));
 }
 
-$handler = $route['handler'];
+$handlerKey = $route['handler'];
 
-if (!isset($app['handlers'][$handler])) {
+if (!isset($app['handlers'][$handlerKey])) {
     emitResponse(jsonErrorResponse(404, 'Not Found', 'HANDLER_NOT_FOUND'));
 }
 
-$callable = $app['handlers'][$handler];
+$callable = $app['handlers'][$handlerKey];
+
+$protected = [
+    'review.index', 'review.show', 'review.store',
+    'artist-image.index', 'artist-image.show', 'artist-image.store',
+];
+
 $handler = new CallableRequestHandler($callable, $route['params']);
 
-$pipeline = new MiddlewarePipeline($handler, [new PassThroughMiddleware()]);
+$middlewares = in_array($handlerKey, $protected) 
+    ? [$app['container']->get(AuthMiddleware::class)] 
+    : [];
+
+$pipeline = new MiddlewarePipeline($handler, $middlewares);
 $response = $pipeline->handle($request);
 
 emitResponse($response);

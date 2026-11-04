@@ -18,15 +18,12 @@ class ArtistImageController
     public function __construct(
         private ArtistImageRepository $artistImageRepository,
         private ArtistRepository $artistRepository,
-        private UploadService $uploadService,
-        private JwtService $jwtService,
+        private UploadService $uploadService
     ) {
     }
 
     public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        \requireAuth($request, $this->jwtService);
-        
         $id = (int) $params['id'];
 
         if($this->artistRepository->show($id) === false) {
@@ -39,9 +36,7 @@ class ArtistImageController
     }
 
     public function show(ServerRequestInterface $request, array $params): ResponseInterface
-    {
-        \requireAuth($request, $this->jwtService);
-        
+    { 
         $id = (int) $params['id'];
         $artistImage = $this->artistImageRepository->show($id);
 
@@ -65,8 +60,6 @@ class ArtistImageController
 
     public function store(ServerRequestInterface $request, array $params): ResponseInterface
     {
-        $auth = \requireAuth($request, $this->jwtService);
-
         $artistId = (int) $params['id'];
         $artist = $this->artistRepository->show($artistId);
 
@@ -74,7 +67,7 @@ class ArtistImageController
             return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
         }
 
-        if ($auth['role'] !== 'artist' || $auth['user_id'] !== (int) $artist['user_id']) {
+        if ($request->getAttribute('role') !== 'artist' || $request->getAttribute('user_id') !== (int) $artist['user_id']) {
             return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
         }
 
