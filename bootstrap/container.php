@@ -16,6 +16,7 @@ use App\Controllers\ArtistController;
 use App\Controllers\AuthController;
 use App\Controllers\ReviewController;
 use App\Controllers\ArtistImageController;
+use App\Http\AuthMiddleware;
 
 function buildContainer(): ContainerInterface
 {
@@ -63,6 +64,9 @@ function buildContainer(): ContainerInterface
 
         ArtistImageController::class => \DI\create(ArtistImageController::class)
             ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(JwtService::class)),
+
+        AuthMiddleware::class => \DI\create(AuthMiddleware::class)
+            ->constructor(\DI\get(JwtService::class)),
     ]);
 
     return $builder->build();
