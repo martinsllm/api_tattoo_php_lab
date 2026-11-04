@@ -16,7 +16,8 @@ class AuthMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private JwtService $jwt,
-    ) {}
+    ) {
+    }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

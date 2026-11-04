@@ -10,9 +10,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ArtistController
 {
-    
     public function __construct(private ArtistRepository $artistRepository)
-    {}
+    {
+    }
 
     public function index(ServerRequestInterface $request, array $params): ResponseInterface
     {

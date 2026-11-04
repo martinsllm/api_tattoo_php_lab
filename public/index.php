@@ -43,12 +43,11 @@ $protected = [
 
 $handler = new CallableRequestHandler($callable, $route['params']);
 
-$middlewares = in_array($handlerKey, $protected) 
-    ? [$app['container']->get(AuthMiddleware::class)] 
+$middlewares = in_array($handlerKey, $protected)
+    ? [$app['container']->get(AuthMiddleware::class)]
     : [];
 
 $pipeline = new MiddlewarePipeline($handler, $middlewares);
 $response = $pipeline->handle($request);
 
 emitResponse($response);
-

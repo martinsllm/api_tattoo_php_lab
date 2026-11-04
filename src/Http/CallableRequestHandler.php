@@ -11,9 +11,10 @@ use Psr\Http\Message\ResponseInterface;
 class CallableRequestHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private mixed $callable, 
-        private array $params) 
-    {}
+        private mixed $callable,
+        private array $params
+    ) {
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {

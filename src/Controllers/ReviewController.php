@@ -30,7 +30,7 @@ class ReviewController
 
         if ($review !== false) {
             return jsonResponse(200, $review);
-        } 
+        }
 
         return jsonErrorResponse(404, 'Review not found', 'REVIEW_NOT_FOUND');
     }

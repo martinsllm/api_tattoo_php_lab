@@ -33,9 +33,9 @@ function jsonErrorResponse(int $status, string $message, string $code, ?array $f
     if ($fiedldErrors !== null) {
         $error['errors'] = $fiedldErrors;
     }
-    
+
     $payload = ['error' => $error];
-    
+
     $stream = Stream::create(json_encode($payload, JSON_THROW_ON_ERROR));
     return new Response($status, [
         'Content-Type' => 'application/json; charset=utf-8',

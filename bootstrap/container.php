@@ -52,7 +52,7 @@ function buildContainer(): ContainerInterface
 
         HealthController::class => \DI\create(HealthController::class),
 
-        
+
         ArtistController::class => \DI\create(ArtistController::class)
             ->constructor(\DI\get(ArtistRepository::class)),
 

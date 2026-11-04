@@ -22,6 +22,7 @@ sprint.md
 Thumbs.db
 
 # Logs / cache (quando existirem)
+.php-cs-fixer.cache
 *.log
 /storage/logs/*
 !/storage/logs/.gitkeep

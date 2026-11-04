@@ -14,12 +14,12 @@ class MiddlewarePipeline implements RequestHandlerInterface
     public function __construct(
         private RequestHandlerInterface $handler,
         private array $middleware,
-    ) {}
+    ) {
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if(empty($this->middleware)) 
-        {
+        if (empty($this->middleware)) {
             return $this->handler->handle($request);
         }
 

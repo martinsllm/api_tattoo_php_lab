@@ -26,7 +26,7 @@ class ArtistImageController
     {
         $id = (int) $params['id'];
 
-        if($this->artistRepository->show($id) === false) {
+        if ($this->artistRepository->show($id) === false) {
             return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
         }
 
@@ -36,7 +36,7 @@ class ArtistImageController
     }
 
     public function show(ServerRequestInterface $request, array $params): ResponseInterface
-    { 
+    {
         $id = (int) $params['id'];
         $artistImage = $this->artistImageRepository->show($id);
 

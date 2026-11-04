@@ -20,7 +20,7 @@ class UserRepository
         $stmt->bindValue('name', $data['name'], PDO::PARAM_STR);
         $stmt->bindValue('role', $data['role'], PDO::PARAM_STR);
         $stmt->execute();
-        
+
         $id = (int) $pdo->lastInsertId();
         return $this->findById($id);
     }

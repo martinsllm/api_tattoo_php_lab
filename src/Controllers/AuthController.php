@@ -26,7 +26,7 @@ class AuthController
             $errors['email'][] = 'Invalid email address.';
         }
 
-        if(!array_key_exists('name', $data) || $data['name'] === '' || $data['name'] === null) {
+        if (!array_key_exists('name', $data) || $data['name'] === '' || $data['name'] === null) {
             $errors['name'][] = 'Name is required.';
         }
 
@@ -46,7 +46,7 @@ class AuthController
             return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
         }
 
-        if($this->userRepository->findByEmail($data['email'])) {
+        if ($this->userRepository->findByEmail($data['email'])) {
             return jsonErrorResponse(409, 'Email already exists.', 'EMAIL_ALREADY_EXISTS');
         }
 
@@ -76,7 +76,7 @@ class AuthController
         if ($errors !== []) {
             return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', $errors);
         }
-        
+
         $user = $this->userRepository->findByEmail($data['email']);
 
         if (!$user) {
@@ -93,6 +93,6 @@ class AuthController
             'user' => $user,
             'token' => $token,
         ]);
-        
+
     }
 }

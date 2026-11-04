@@ -18,11 +18,11 @@ function uploadedFileToLegacyEntry(UploadedFileInterface $file): array
 
 function psr7UploadedFileToLegacyEntry(mixed $node): array
 {
-    if($node instanceof UploadedFileInterface) {
+    if ($node instanceof UploadedFileInterface) {
         return uploadedFileToLegacyEntry($node);
     }
-    
-    if(!is_array($node)) {
+
+    if (!is_array($node)) {
         return [];
     }
 
@@ -38,7 +38,7 @@ function psr7UploadedFileToLegacyEntry(mixed $node): array
     }
 
     return $entry;
-    
+
 }
 
 function requestFilesBag(ServerRequestInterface $request): array

@@ -23,6 +23,17 @@ composer install
 cp .env.example .env
 ```
 
+### Estilo (PSR-12)
+
+Dependência de desenvolvimento: **PHP-CS-Fixer** (regra `@PSR12` em `.php-cs-fixer.dist.php`).
+
+```bash
+composer lint        # só verifica (CI / antes do commit)
+composer lint:fix    # corrige o que a ferramenta conseguir
+```
+
+Se `composer lint` terminar com código **8**, há arquivos fora do padrão — rode `lint:fix` ou ajuste na mão.
+
 Ajuste o `.env` (banco e `JWT_SECRET`). Gere uma secret forte, por exemplo:
 
 ```bash
@@ -125,7 +136,7 @@ O projeto segue [PHP-FIG PSRs](https://www.php-fig.org/psr/) onde faz sentido pa
 | PSR | Tema | Neste repositório |
 |-----|------|-------------------|
 | **PSR-4** | Autoload (namespace → pasta) | **Em uso** — `composer.json` mapeia `App\` → `src/` |
-| **PSR-12** | Estilo de código | Parcialmente na mão; ferramenta (`composer lint`) prevista no backlog **#13** |
+| **PSR-12** | Estilo de código | **Em uso (#13)** — [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer) com regra `@PSR12`; `composer lint` (só verifica), `composer lint:fix` (aplica) |
 | **PSR-11** | Container de DI (`ContainerInterface`) | **Em uso** — [PHP-DI](https://php-di.org/) em `bootstrap/container.php`; `app.php` monta o container e `handlers.php` resolve controllers com `$container->get(...)` |
 | **PSR-7** | Mensagens HTTP (Request / Response) | **Em uso (#19, #21)** — Nyholm; `ServerRequest` + `ResponseInterface`; `requestJsonBody($request)`, `requestFilesBag($request)`; `emitResponse()` no `index` |
 | **PSR-15** | Middleware + request handler | **Em uso (#20)** — `MiddlewarePipeline`, `CallableRequestHandler`, `AuthMiddleware` nas rotas protegidas; `user_id` / `role` em atributos do request |
