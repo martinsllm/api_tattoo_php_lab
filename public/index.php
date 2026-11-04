@@ -9,6 +9,10 @@ require __DIR__ . '/../bootstrap/uploads.php';
 require __DIR__ . '/../bootstrap/auth.php';
 require __DIR__ . '/../bootstrap/handlers.php';
 
+use App\Http\CallableRequestHandler;
+use App\Http\MiddlewarePipeline;
+use App\Http\PassThroughMiddleware;
+
 loadEnv(__DIR__ . '/../.env');
 
 $request = createServerRequest();
@@ -30,6 +34,11 @@ if (!isset($app['handlers'][$handler])) {
     emitResponse(jsonErrorResponse(404, 'Not Found', 'HANDLER_NOT_FOUND'));
 }
 
-$response = $app['handlers'][$handler]($request, $route['params']);
+$callable = $app['handlers'][$handler];
+$handler = new CallableRequestHandler($callable, $route['params']);
+
+$pipeline = new MiddlewarePipeline($handler, [new PassThroughMiddleware()]);
+$response = $pipeline->handle($request);
+
 emitResponse($response);
 
