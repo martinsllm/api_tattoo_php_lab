@@ -17,6 +17,7 @@ use App\Controllers\AuthController;
 use App\Controllers\ReviewController;
 use App\Controllers\ArtistImageController;
 use App\Http\AuthMiddleware;
+use App\Http\ExceptionMiddleware;
 
 function buildContainer(): ContainerInterface
 {
@@ -67,6 +68,8 @@ function buildContainer(): ContainerInterface
 
         AuthMiddleware::class => \DI\create(AuthMiddleware::class)
             ->constructor(\DI\get(JwtService::class)),
+
+        ExceptionMiddleware::class => \DI\create(ExceptionMiddleware::class),
     ]);
 
     return $builder->build();

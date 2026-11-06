@@ -12,6 +12,7 @@ require __DIR__ . '/../bootstrap/handlers.php';
 use App\Http\CallableRequestHandler;
 use App\Http\MiddlewarePipeline;
 use App\Http\AuthMiddleware;
+use App\Http\ExceptionMiddleware;
 
 loadEnv(__DIR__ . '/../.env');
 
@@ -43,9 +44,11 @@ $protected = [
 
 $handler = new CallableRequestHandler($callable, $route['params']);
 
-$middlewares = in_array($handlerKey, $protected)
-    ? [$app['container']->get(AuthMiddleware::class)]
-    : [];
+$middlewares = [$app['container']->get(ExceptionMiddleware::class)];
+
+if (in_array($handlerKey, $protected, true)) {
+    $middlewares[] = $app['container']->get(AuthMiddleware::class);
+}
 
 $pipeline = new MiddlewarePipeline($handler, $middlewares);
 $response = $pipeline->handle($request);
