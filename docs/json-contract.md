@@ -159,7 +159,7 @@ Respostas JSON seguem [PSR-7](https://www.php-fig.org/psr/psr-7/) via [Nyholm/ps
 | `jsonResponse(int $status, array $data)` | `ResponseInterface` | Sucesso 2xx — corpo `{ "data": … }` |
 | `jsonErrorResponse(int $status, string $message, string $code, ?array $fieldErrors = null)` | `ResponseInterface` | Erro 4xx/5xx — corpo `{ "error": … }`; `$fieldErrors` vira `error.errors` (422) |
 | `emitResponse(ResponseInterface $response)` | `void` (termina com `exit`) | Envia status, headers e body ao SAPI (PHP built-in server, FPM, etc.) |
-| `requestJsonBody(ServerRequestInterface $request): array` | `array` | Body JSON do request PSR-7; inválido → **400** `INVALID_JSON` |
+| `requestJsonBody(ServerRequestInterface $request): array` | `array` | Body JSON do request PSR-7. Sintaxe inválida ou valor JSON que não seja objeto (array na raiz) → lança **`App\Exception\InvalidJsonException`**; o **`ExceptionMiddleware`** responde **400** `INVALID_JSON` (mesmo envelope dos exemplos abaixo). Não usa `emitResponse` dentro do helper. |
 | `requestFilesBag(ServerRequestInterface $request): array` | `array` | Uploads via `getUploadedFiles()` (`bootstrap/uploads.php`) |
 
 ### Fluxo
@@ -167,6 +167,6 @@ Respostas JSON seguem [PSR-7](https://www.php-fig.org/psr/psr-7/) via [Nyholm/ps
 1. **`public/index.php`** — `createServerRequest()`; roteamento; 404 com `emitResponse(jsonErrorResponse(...))`; pipeline com **`ExceptionMiddleware`** (mais externo) e, nas rotas protegidas, **`AuthMiddleware`**; `$response = $pipeline->handle($request)`; `emitResponse($response)`. Handlers em `bootstrap/handlers.php` são **lazy** (closure): o container só instancia o controller da rota no dispatch, para falhas de banco passarem pelo middleware.
 2. **Controllers** — `return jsonResponse(...)` ou `return jsonErrorResponse(...)`; rotas autenticadas leem **`$request->getAttribute('user_id')`** e **`role`** (403 no handler quando aplicável).
 3. **`App\Http\AuthMiddleware`** — JWT Bearer; **401** retorna `jsonErrorResponse` (sem `emitResponse`); sucesso enriquece o request com atributos.
-4. **`App\Http\ExceptionMiddleware`** — `HttpException` → JSON conforme status/código da exceção; demais `Throwable` → **500** `INTERNAL_ERROR` (detalhe conforme `APP_DEBUG`).
+4. **`App\Http\ExceptionMiddleware`** — `HttpException` → JSON conforme status/código da exceção (inclui **`InvalidJsonException`** no fluxo de `requestJsonBody`); demais `Throwable` → **500** `INTERNAL_ERROR` (detalhe conforme `APP_DEBUG`).
 
 Respostas **não JSON** (ex.: imagem em `GET /artist-images/{id}`) usam `Response` com `Content-Type` e stream do arquivo; o mesmo `emitResponse` no `index`.
