@@ -8,6 +8,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use App\Exception\InvalidJsonException;
 
 function requestPath(ServerRequestInterface $request): string
 {
@@ -64,12 +65,12 @@ function requestJsonBody(ServerRequestInterface $request): array
 
     try {
         $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
-    } catch (JsonException) {
-        emitResponse(jsonErrorResponse(400, 'Invalid JSON body', 'INVALID_JSON'));
+    } catch (\JsonException) {
+        throw new InvalidJsonException('Invalid JSON body');
     }
 
     if (!is_array($decoded)) {
-        emitResponse(jsonErrorResponse(400, 'JSON body must be an object', 'INVALID_JSON'));
+        throw new InvalidJsonException('JSON body must be an object');
     }
 
     return $decoded;
