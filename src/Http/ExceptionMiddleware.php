@@ -23,7 +23,14 @@ class ExceptionMiddleware implements MiddlewareInterface
                 $e->errorCode(),
                 $e->fieldErrors()
             );
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            if (filter_var(env('APP_DEBUG', 'false'), FILTER_VALIDATE_BOOLEAN)) {
+                return jsonErrorResponse(
+                    500,
+                    $e->getMessage(),
+                    'INTERNAL_ERROR',
+                );
+            }
             return jsonErrorResponse(
                 500,
                 'Internal Server Error',
