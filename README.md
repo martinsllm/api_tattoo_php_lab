@@ -40,6 +40,8 @@ Ajuste o `.env` (banco e `JWT_SECRET`). Gere uma secret forte, por exemplo:
 openssl rand -base64 32
 ```
 
+Use **`APP_DEBUG=true`** só em desenvolvimento local: com esse modo, respostas **500** podem incluir a mensagem da exceção (útil no Insomnia). Em qualquer ambiente exposto, prefira **`APP_DEBUG=false`** para mensagem genérica e código `INTERNAL_ERROR` (ver [`docs/json-contract.md`](docs/json-contract.md)).
+
 ---
 
 ## Banco de dados
