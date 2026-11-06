@@ -12,16 +12,16 @@ use App\Controllers\AuthController;
 function routeHandlers(ContainerInterface $container): array
 {
     return [
-        'health' => [$container->get(HealthController::class), 'index'],
-        'artist.index' => [$container->get(ArtistController::class), 'index'],
-        'artist.show' => [$container->get(ArtistController::class), 'show'],
-        'review.store' => [$container->get(ReviewController::class), 'store'],
-        'review.index' => [$container->get(ReviewController::class), 'index'],
-        'review.show' => [$container->get(ReviewController::class), 'show'],
-        'artist-image.store' => [$container->get(ArtistImageController::class), 'store'],
-        'artist-image.show' => [$container->get(ArtistImageController::class), 'show'],
-        'artist-image.index' => [$container->get(ArtistImageController::class), 'index'],
-        'auth.register' => [$container->get(AuthController::class), 'register'],
-        'auth.login' => [$container->get(AuthController::class), 'login']
+        'health' => fn ($request, $params) => $container->get(HealthController::class)->index($request, $params),
+        'artist.index' => fn ($request, $params) => $container->get(ArtistController::class)->index($request, $params),
+        'artist.show' => fn ($request, $params) => $container->get(ArtistController::class)->show($request, $params),
+        'review.store' => fn ($request, $params) => $container->get(ReviewController::class)->store($request, $params),
+        'review.index' => fn ($request, $params) => $container->get(ReviewController::class)->index($request, $params),
+        'review.show' => fn ($request, $params) => $container->get(ReviewController::class)->show($request, $params),
+        'artist-image.store' => fn ($request, $params) => $container->get(ArtistImageController::class)->store($request, $params),
+        'artist-image.show' => fn ($request, $params) => $container->get(ArtistImageController::class)->show($request, $params),
+        'artist-image.index' => fn ($request, $params) => $container->get(ArtistImageController::class)->index($request, $params),
+        'auth.register' => fn ($request, $params) => $container->get(AuthController::class)->register($request, $params),
+        'auth.login' => fn ($request, $params) => $container->get(AuthController::class)->login($request, $params)
     ];
 }
