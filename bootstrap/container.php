@@ -56,7 +56,6 @@ function buildContainer(): ContainerInterface
 
         HealthController::class => \DI\create(HealthController::class),
 
-
         ArtistController::class => \DI\create(ArtistController::class)
             ->constructor(\DI\get(ArtistRepository::class)),
 
@@ -69,18 +68,11 @@ function buildContainer(): ContainerInterface
         ArtistImageController::class => \DI\create(ArtistImageController::class)
             ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(JwtService::class)),
 
-
         AuthMiddleware::class => \DI\create(AuthMiddleware::class)
             ->constructor(\DI\get(JwtService::class)),
 
         ExceptionMiddleware::class => \DI\create(ExceptionMiddleware::class),
 
-        LoginValidator::class => \DI\create(LoginValidator::class),
-
-        RegisterValidator::class => \DI\create(RegisterValidator::class),
-
-        ReviewStoreValidator::class => \DI\create(ReviewStoreValidator::class)
-            ->constructor(\DI\get(ArtistRepository::class)),
     ]);
 
     return $builder->build();
