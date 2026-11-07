@@ -20,6 +20,7 @@ use App\Http\AuthMiddleware;
 use App\Http\ExceptionMiddleware;
 use App\Validation\LoginValidator;
 use App\Validation\RegisterValidator;
+use App\Validation\ReviewStoreValidator;
 
 function buildContainer(): ContainerInterface
 {
@@ -63,7 +64,7 @@ function buildContainer(): ContainerInterface
             ->constructor(\DI\get(UserRepository::class), \DI\get(JwtService::class), \DI\get(LoginValidator::class), \DI\get(RegisterValidator::class)),
 
         ReviewController::class => \DI\create(ReviewController::class)
-            ->constructor(\DI\get(ReviewRepository::class), \DI\get(ArtistRepository::class), \DI\get(JwtService::class)),
+            ->constructor(\DI\get(ReviewRepository::class), \DI\get(ArtistRepository::class), \DI\get(ReviewStoreValidator::class)),
 
         ArtistImageController::class => \DI\create(ArtistImageController::class)
             ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(JwtService::class)),
@@ -75,6 +76,11 @@ function buildContainer(): ContainerInterface
         ExceptionMiddleware::class => \DI\create(ExceptionMiddleware::class),
 
         LoginValidator::class => \DI\create(LoginValidator::class),
+
+        RegisterValidator::class => \DI\create(RegisterValidator::class),
+
+        ReviewStoreValidator::class => \DI\create(ReviewStoreValidator::class)
+            ->constructor(\DI\get(ArtistRepository::class)),
     ]);
 
     return $builder->build();
