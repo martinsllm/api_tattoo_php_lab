@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Repositories\ArtistRepository;
+use App\Exception\NotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -24,10 +25,10 @@ class ArtistController
         $id = (int) $params['id'];
         $artist = $this->artistRepository->show($id);
 
-        if ($artist !== false) {
-            return jsonResponse(200, $artist);
+        if ($artist === false) {
+            throw new NotFoundException('Artist not found', 'ARTIST_NOT_FOUND');
         }
 
-        return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+        return jsonResponse(200, $artist);
     }
 }
