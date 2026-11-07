@@ -22,6 +22,8 @@ Use **`throw`** para erros **previstos** que o middleware já sabe traduzir em J
 | Validação de campos | `ValidationFailedException` (`VALIDATION_ERROR` + `error.errors`) |
 | Body JSON inválido | `InvalidJsonException` (`INVALID_JSON`) — via `requestJsonBody()` |
 | Falha ao persistir upload (após validação) | `UploadFailedException` (`UPLOAD_FAILED`) |
+| Conflito de negócio (email duplicado) | `ConflictException` (`EMAIL_ALREADY_EXISTS`, …) |
+| Credenciais de login inválidas | `UnauthorizedException` (`INVALID_CREDENTIALS`) — **não** confundir com Bearer `UNAUTHORIZED` |
 
 Hierarquia: todas estendem **`App\Exception\HttpException`** (`statusCode()`, `errorCode()`, `fieldErrors()` opcional).
 
@@ -30,10 +32,9 @@ Hierarquia: todas estendem **`App\Exception\HttpException`** (`statusCode()`, `e
 | Onde | Motivo |
 |------|--------|
 | **`public/index.php`** | Rota/handler inexistente (fora do pipeline de controllers) |
-| **`AuthMiddleware`** | **401** Bearer/JWT — já estabelecido no #20; fora do inventário de controllers |
-| **`AuthController` (transição)** | **409** e **401** login ainda retornam `jsonErrorResponse` — ver seção [Auth 409/401](#auth-409401--onde-migrar) abaixo |
+| **`AuthMiddleware`** | **401** Bearer/JWT — `return jsonErrorResponse` (`UNAUTHORIZED`) |
 
-Meta após polish: **zero** `return jsonErrorResponse` nos controllers do inventário #23.
+**Meta #23:** **zero** `return jsonErrorResponse` nos **controllers** do inventário — ✅ controllers só usam `throw` + `jsonResponse` (07/11/2026).
 
 ## Validators
 
@@ -48,22 +49,14 @@ Meta após polish: **zero** `return jsonErrorResponse` nos controllers do invent
 - `InvalidArgumentException` → `ValidationFailedException` com chave `images`.
 - `RuntimeException` → `UploadFailedException`.
 
-## Auth 409/401 — onde migrar
+## Auth 409/401 (implementado)
 
-Ainda **não** migrados (C1 deixou de propósito):
+| Situação | Classe | `error.code` |
+|----------|--------|----------------|
+| Email já existe no register | `ConflictException` | `EMAIL_ALREADY_EXISTS` |
+| Login email/senha inválidos | `UnauthorizedException` | `INVALID_CREDENTIALS` |
 
-| Arquivo | Situação | Hoje | Destino sugerido |
-|---------|----------|------|------------------|
-| `src/Controllers/AuthController.php` | Email duplicado no register | `return jsonErrorResponse(409, …, 'EMAIL_ALREADY_EXISTS')` | `throw` exceção **409** (ex.: `ConflictException` com code parametrizado) |
-| `src/Controllers/AuthController.php` | Credenciais inválidas no login (2 ramos) | `return jsonErrorResponse(401, …, 'INVALID_CREDENTIALS')` | `throw` exceção **401** (ex.: `UnauthorizedException` ou `InvalidCredentialsException` com `INVALID_CREDENTIALS`) |
-
-**Não confundir** com **401** `UNAUTHORIZED` do **`AuthMiddleware`** (token ausente/inválido) — esse fica no middleware.
-
-Passos ao migrar (mentoria):
-
-1. Criar exceção(s) `extends HttpException` (409 com `errorCode` parametrizável, como `NotFoundException`).
-2. Substituir os três `return jsonErrorResponse` no `AuthController` por `throw`.
-3. Insomnia: register duplicado, login senha errada, login inexistente — mesmos status/body.
+Bearer JWT inválido continua no **`AuthMiddleware`**: **401** `UNAUTHORIZED`.
 
 ## Checklist Insomnia / curl (regressão #23)
 

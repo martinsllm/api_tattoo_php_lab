@@ -175,7 +175,7 @@ Respostas JSON seguem [PSR-7](https://www.php-fig.org/psr/psr-7/) via [Nyholm/ps
 ### Fluxo
 
 1. **`public/index.php`** — `createServerRequest()`; roteamento; 404 com `emitResponse(jsonErrorResponse(...))`; pipeline com **`ExceptionMiddleware`** (mais externo) e, nas rotas protegidas, **`AuthMiddleware`**; `$response = $pipeline->handle($request)`; `emitResponse($response)`. Handlers em `bootstrap/handlers.php` são **lazy** (closure): o container só instancia o controller da rota no dispatch, para falhas de banco passarem pelo middleware.
-2. **Controllers** — sucesso: `return jsonResponse(...)`; erros previstos: **`throw`** exceções `App\Exception\HttpException` (middleware monta o JSON). Exceções: **409/401** no login/register ainda podem usar `return jsonErrorResponse` até o polish de auth — ver [`error-conventions.md`](error-conventions.md). Rotas autenticadas leem **`user_id`** / **`role`** nos atributos do request.
+2. **Controllers** — sucesso: `return jsonResponse(...)`; erros previstos: **`throw`** exceções `App\Exception\HttpException` (middleware monta o JSON). Rotas autenticadas leem **`user_id`** / **`role`** nos atributos do request. Ver [`error-conventions.md`](error-conventions.md).
 3. **`App\Http\AuthMiddleware`** — JWT Bearer; **401** retorna `jsonErrorResponse` (sem `emitResponse`); sucesso enriquece o request com atributos.
 4. **`App\Http\ExceptionMiddleware`** — `HttpException` → JSON conforme status/código da exceção (inclui **`InvalidJsonException`** no fluxo de `requestJsonBody`); demais `Throwable` → **500** `INTERNAL_ERROR` (detalhe conforme `APP_DEBUG`).
 

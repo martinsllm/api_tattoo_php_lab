@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http;
 
+use App\Exception\UnauthorizedException;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -24,13 +25,13 @@ class AuthMiddleware implements MiddlewareInterface
         $token = bearerToken($request);
 
         if ($token === null) {
-            return jsonErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED');
+            throw new UnauthorizedException('Unauthorized', 'UNAUTHORIZED');
         }
 
         try {
             $decoded = $this->jwt->decode($token);
         } catch (ExpiredException|SignatureInvalidException|\UnexpectedValueException) {
-            return jsonErrorResponse(401, 'Unauthorized', 'UNAUTHORIZED');
+            throw new UnauthorizedException('Unauthorized', 'UNAUTHORIZED');
         }
 
         $request = $request

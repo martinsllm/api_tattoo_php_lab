@@ -8,6 +8,8 @@ use App\Repositories\UserRepository;
 use App\Services\JwtService;
 use App\Validation\LoginValidator;
 use App\Validation\RegisterValidator;
+use App\Exception\ConflictException;
+use App\Exception\UnauthorizedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,7 +25,7 @@ class AuthController
         $data = $this->registerValidator->validate($data);
 
         if ($this->userRepository->findByEmail($data['email'])) {
-            return jsonErrorResponse(409, 'Email already exists.', 'EMAIL_ALREADY_EXISTS');
+            throw new ConflictException('Email already exists.', 'EMAIL_ALREADY_EXISTS');
         }
 
         $user = $this->userRepository->create([
@@ -44,11 +46,11 @@ class AuthController
         $user = $this->userRepository->findByEmail($data['email']);
 
         if (!$user) {
-            return jsonErrorResponse(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+            throw new UnauthorizedException('Invalid credentials.', 'INVALID_CREDENTIALS');
         }
 
         if (!password_verify($data['password'], $user['password_hash'])) {
-            return jsonErrorResponse(401, 'Invalid credentials.', 'INVALID_CREDENTIALS');
+            throw new UnauthorizedException('Invalid credentials.', 'INVALID_CREDENTIALS');
         }
 
         unset($user['password_hash']);
