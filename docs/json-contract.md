@@ -19,13 +19,23 @@ Valores aceitos para `APP_DEBUG` são interpretados com `filter_var(..., FILTER_
 
 ## Códigos de erro (v1)
 
-| code             | HTTP | Quando usar                                      |
-| ---------------- | ---- | ------------------------------------------------ |
-| `ROUTE_NOT_FOUND`  | 404  | Rota ou handler inexistente                      |
-| `ARTIST_NOT_FOUND` | 404  | `GET /artists/{id}` sem registro no banco        |
-| `VALIDATION_ERROR` | 422  | Payload inválido em `POST /reviews`              |
-| `INVALID_JSON`     | 400  | Body não é JSON válido ou não é um objeto JSON     |
-| `INTERNAL_ERROR`   | 500  | Falha não prevista (PDO, bug, etc.) — ver seção acima |
+| code                   | HTTP | Quando usar |
+| ---------------------- | ---- | ----------- |
+| `ROUTE_NOT_FOUND`      | 404  | Rota ou handler inexistente (`index.php`) |
+| `HANDLER_NOT_FOUND`    | 404  | Handler key sem closure no mapa |
+| `ARTIST_NOT_FOUND`     | 404  | Artista inexistente (`GET /artists/{id}`, portfolio, etc.) |
+| `REVIEW_NOT_FOUND`     | 404  | `GET /reviews/{id}` sem registro |
+| `ARTIST_IMAGE_NOT_FOUND` | 404 | Metadado ou arquivo de imagem inexistente |
+| `UNAUTHORIZED`         | 401  | Bearer ausente ou JWT inválido (`AuthMiddleware`) |
+| `INVALID_CREDENTIALS`  | 401  | Login com email/senha incorretos (`AuthController`) |
+| `FORBIDDEN`            | 403  | Role/dono (reviews client-only, portfolio do artista) |
+| `EMAIL_ALREADY_EXISTS` | 409  | Register com email já cadastrado (`AuthController`) |
+| `VALIDATION_ERROR`     | 422  | Payload inválido (validators; campo `errors` em `error`) |
+| `INVALID_JSON`         | 400  | Body não é JSON válido ou não é objeto (`requestJsonBody`) |
+| `UPLOAD_FAILED`        | 500  | Falha ao gravar upload no disco (`UploadFailedException`) |
+| `INTERNAL_ERROR`       | 500  | Falha não prevista (PDO, bug, etc.) — ver seção acima |
+
+Convenções (`throw` vs `return`, validators, checklist): [`error-conventions.md`](error-conventions.md).
 
 ## Exemplos — sucesso
 
@@ -165,7 +175,7 @@ Respostas JSON seguem [PSR-7](https://www.php-fig.org/psr/psr-7/) via [Nyholm/ps
 ### Fluxo
 
 1. **`public/index.php`** — `createServerRequest()`; roteamento; 404 com `emitResponse(jsonErrorResponse(...))`; pipeline com **`ExceptionMiddleware`** (mais externo) e, nas rotas protegidas, **`AuthMiddleware`**; `$response = $pipeline->handle($request)`; `emitResponse($response)`. Handlers em `bootstrap/handlers.php` são **lazy** (closure): o container só instancia o controller da rota no dispatch, para falhas de banco passarem pelo middleware.
-2. **Controllers** — `return jsonResponse(...)` ou `return jsonErrorResponse(...)`; rotas autenticadas leem **`$request->getAttribute('user_id')`** e **`role`** (403 no handler quando aplicável).
+2. **Controllers** — sucesso: `return jsonResponse(...)`; erros previstos: **`throw`** exceções `App\Exception\HttpException` (middleware monta o JSON). Exceções: **409/401** no login/register ainda podem usar `return jsonErrorResponse` até o polish de auth — ver [`error-conventions.md`](error-conventions.md). Rotas autenticadas leem **`user_id`** / **`role`** nos atributos do request.
 3. **`App\Http\AuthMiddleware`** — JWT Bearer; **401** retorna `jsonErrorResponse` (sem `emitResponse`); sucesso enriquece o request com atributos.
 4. **`App\Http\ExceptionMiddleware`** — `HttpException` → JSON conforme status/código da exceção (inclui **`InvalidJsonException`** no fluxo de `requestJsonBody`); demais `Throwable` → **500** `INTERNAL_ERROR` (detalhe conforme `APP_DEBUG`).
 

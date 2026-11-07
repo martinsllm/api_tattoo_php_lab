@@ -127,7 +127,7 @@ Base URL: `http://127.0.0.1:8081`
 
 Login: `POST /auth/login` com JSON `email` e `password` → resposta inclui `token`. Demais rotas protegidas: header `Authorization: Bearer <token>`.
 
-Erros JSON: `{ "error": { "message", "code", "errors?" } }`. Sucesso: `{ "data": ... }`. Detalhes em [`docs/json-contract.md`](docs/json-contract.md).
+Erros JSON: `{ "error": { "message", "code", "errors?" } }`. Sucesso: `{ "data": ... }`. Detalhes em [`docs/json-contract.md`](docs/json-contract.md). Convenções de exceções (#23): [`docs/error-conventions.md`](docs/error-conventions.md).
 
 ---
 
