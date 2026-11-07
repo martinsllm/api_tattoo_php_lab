@@ -31,11 +31,11 @@ class ReviewController
         $id = (int) $params['id'];
         $review = $this->reviewRepository->show($id);
 
-        if ($review !== false) {
-            return jsonResponse(200, $review);
+        if ($review === false) {
+            throw new NotFoundException('Review not found', 'REVIEW_NOT_FOUND');
         }
 
-        throw new NotFoundException('Review not found', 'REVIEW_NOT_FOUND');
+        return jsonResponse(200, $review);
     }
 
     public function store(ServerRequestInterface $request, array $params): ResponseInterface

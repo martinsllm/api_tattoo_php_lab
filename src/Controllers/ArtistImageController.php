@@ -6,8 +6,12 @@ namespace App\Controllers;
 
 use App\Repositories\ArtistImageRepository;
 use App\Repositories\ArtistRepository;
-use App\Services\JwtService;
 use App\Services\UploadService;
+use App\Validation\ArtistImageStoreValidator;
+use App\Exception\NotFoundException;
+use App\Exception\ForbiddenException;
+use App\Exception\ValidationFailedException;
+use App\Exception\UploadFailedException;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
@@ -18,7 +22,8 @@ class ArtistImageController
     public function __construct(
         private ArtistImageRepository $artistImageRepository,
         private ArtistRepository $artistRepository,
-        private UploadService $uploadService
+        private UploadService $uploadService,
+        private ArtistImageStoreValidator $artistImageStoreValidator
     ) {
     }
 
@@ -27,7 +32,7 @@ class ArtistImageController
         $id = (int) $params['id'];
 
         if ($this->artistRepository->show($id) === false) {
-            return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+            throw new NotFoundException('Artist not found', 'ARTIST_NOT_FOUND');
         }
 
         $images = $this->artistImageRepository->index($id);
@@ -41,14 +46,14 @@ class ArtistImageController
         $artistImage = $this->artistImageRepository->show($id);
 
         if ($artistImage === false) {
-            return jsonErrorResponse(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+            throw new NotFoundException('Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
         }
 
         $root = rtrim($this->uploadService->uploadsRoot(), '/');
         $path = $root . '/' . $artistImage['stored_path'];
 
         if (!is_file($path)) {
-            return jsonErrorResponse(404, 'Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
+            throw new NotFoundException('Artist image not found', 'ARTIST_IMAGE_NOT_FOUND');
         }
 
         $stream = Stream::create(fopen($path, 'rb'));
@@ -64,30 +69,26 @@ class ArtistImageController
         $artist = $this->artistRepository->show($artistId);
 
         if ($artist === false) {
-            return jsonErrorResponse(404, 'Artist not found', 'ARTIST_NOT_FOUND');
+            throw new NotFoundException('Artist not found', 'ARTIST_NOT_FOUND');
         }
 
         if ($request->getAttribute('role') !== 'artist' || $request->getAttribute('user_id') !== (int) $artist['user_id']) {
-            return jsonErrorResponse(403, 'Forbidden', 'FORBIDDEN');
+            throw new ForbiddenException('Forbidden', 'FORBIDDEN');
         }
 
-        $items = $this->uploadService->normalizeFiles('images', requestFilesBag($request));
-        if ($items === []) {
-            return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', [
-                'images' => ['At least one image is required.'],
-            ]);
-        }
+        $normalizedFiles = $this->uploadService->normalizeFiles('images', requestFilesBag($request));
+        $items = $this->artistImageStoreValidator->validate(['items' => $normalizedFiles]);
 
         $created = [];
         foreach ($items as $file) {
             try {
                 $stored = $this->uploadService->uploadFile($artistId, $file);
             } catch (\InvalidArgumentException $e) {
-                return jsonErrorResponse(422, 'Validation failed', 'VALIDATION_ERROR', [
+                throw new ValidationFailedException([
                     'images' => [$e->getMessage()],
                 ]);
             } catch (\RuntimeException) {
-                return jsonErrorResponse(500, 'Could not save upload', 'UPLOAD_FAILED');
+                throw new UploadFailedException('Could not save upload');
             }
 
             $created[] = $this->artistImageRepository->create([

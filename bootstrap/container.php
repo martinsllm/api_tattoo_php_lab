@@ -21,6 +21,7 @@ use App\Http\ExceptionMiddleware;
 use App\Validation\LoginValidator;
 use App\Validation\RegisterValidator;
 use App\Validation\ReviewStoreValidator;
+use App\Validation\ArtistImageStoreValidator;
 
 function buildContainer(): ContainerInterface
 {
@@ -66,7 +67,7 @@ function buildContainer(): ContainerInterface
             ->constructor(\DI\get(ReviewRepository::class), \DI\get(ArtistRepository::class), \DI\get(ReviewStoreValidator::class)),
 
         ArtistImageController::class => \DI\create(ArtistImageController::class)
-            ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(JwtService::class)),
+            ->constructor(\DI\get(ArtistImageRepository::class), \DI\get(ArtistRepository::class), \DI\get(UploadService::class), \DI\get(ArtistImageStoreValidator::class)),
 
         AuthMiddleware::class => \DI\create(AuthMiddleware::class)
             ->constructor(\DI\get(JwtService::class)),
